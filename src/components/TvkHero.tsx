@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Fragment } from "react";
 
+import { BrandStrip } from "@/components/BrandStrip";
 import { useI18n } from "@/i18n";
 
 import ambedkar from "@/assets/hero/img/ambedkar.png";
@@ -79,6 +80,14 @@ export function TvkHero() {
           <img className="hero-flagbrush" src={flagbrush} alt="" aria-hidden="true" />
           <img className="hero-leader" src={leader} alt={t("home.hero.leaderAlt")} />
         </div>
+      </div>
+
+      {/* Tricolour divider between the hero and the next section — softens the
+          hard background cut on phone screens. Hidden from lg up, where the
+          two-column hero already blends into the page. Wrapped in a plain div
+          because the strip's own display:flex would out-cascade `hidden`. */}
+      <div className="no-print lg:hidden">
+        <BrandStrip />
       </div>
     </section>
   );
