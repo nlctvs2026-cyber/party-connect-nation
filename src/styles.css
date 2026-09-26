@@ -81,6 +81,13 @@
     border-color: var(--color-border);
   }
 
+  html,
+  body {
+    /* Safety net: the page must never show a horizontal scrollbar. */
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -124,6 +131,40 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+}
+
+/*
+ * Homepage banner — exact image extracted from nlc_banner_exact.html.
+ * The standalone file used fixed 1672px × 941px dimensions; here the image
+ * stays fluid so it always fits the viewport while keeping its original
+ * aspect ratio (no stretching, cropping or distortion, no horizontal scroll).
+ */
+.banner-section {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.banner-frame {
+  width: 100%;
+  max-width: 1672px;
+  margin-inline: auto;
+  overflow: hidden;
+}
+
+img.banner {
+  display: block;
+  width: 100%;
+  max-width: 1672px;
+  height: auto;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  img.banner {
+    /* Never let the banner push the page wider than the phone screen. */
+    max-width: 100%;
+  }
 }
 
 @media print {
