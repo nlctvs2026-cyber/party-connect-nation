@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 
 import { SiteLayout } from "@/components/SiteLayout";
 import { useI18n } from "@/i18n";
+import { compressPhoto } from "@/lib/photo-compress";
 import {
   ALLOWED_PHOTO_EXTENSIONS,
   ALLOWED_PHOTO_TYPES,
@@ -146,6 +147,12 @@ function EnrollPage() {
     // The database's unique constraint re-checks, covering race conditions.
     setSubmitting(true);
     try {
+      // Compress client-side (600×750 box, JPEG, ≤100 KB) so storage stays
+      // tiny and card pages load fast on mobile data. The compressed file
+      // replaces the picker's file so the size note reflects what is sent.
+      const compressed = await compressPhoto(photo);
+      setPhoto(compressed);
+
       const available = await phoneCanApply(phone);
       if (!available) {
         setErrors({ phone: t("enroll.errors.phoneTaken") });
@@ -159,7 +166,7 @@ function EnrollPage() {
         district,
         constituency,
         dateOfBirth,
-        photo,
+        photo: compressed,
         cpfNo,
         posting,
       });

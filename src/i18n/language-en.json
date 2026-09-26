@@ -75,7 +75,7 @@
     "posting": "Posting",
     "postingSelect": "Select posting",
     "photo": "Profile photo",
-    "photoHint": "JPG or PNG, up to 5 MB",
+    "photoHint": "JPG or PNG, up to 5 MB — optimized automatically",
     "submit": "Submit enrollment",
     "submitting": "Submitting...",
     "errors": {
