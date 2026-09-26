@@ -30,12 +30,17 @@ BEGIN
     RAISE EXCEPTION 'invalid phone';
   END IF;
 
-  -- BUG-004/006: letters (any script) and spaces only, 2-70 characters.
+  -- BUG-004/006: letters and spaces only, 2-70 characters.
+  -- NOTE: PostgreSQL regex has no \p{...} Unicode classes (that is JS/ICU
+  -- syntax) — using one here fails to compile with "invalid escape \" and
+  -- breaks every enrollment. Guard ASCII letters server-side; the full
+  -- any-script Unicode check (incl. Tamil) is enforced client-side in
+  -- enroll.tsx via NAME_ALLOWED/NAME_INVALID.
   _full_name := trim(_full_name);
   IF _full_name IS NULL
      OR length(_full_name) < 2
      OR length(_full_name) > 70
-     OR _full_name ~ '[^\p{L}\s]' THEN
+     OR _full_name ~ '[^a-zA-Z\s]' THEN
     RAISE EXCEPTION 'invalid name';
   END IF;
 
