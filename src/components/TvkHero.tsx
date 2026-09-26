@@ -84,9 +84,10 @@ export function TvkHero() {
 
       {/* Tricolour divider between the hero and the next section — softens the
           hard background cut on phone screens. Hidden from lg up, where the
-          two-column hero already blends into the page. Wrapped in a plain div
-          because the strip's own display:flex would out-cascade `hidden`. */}
-      <div className="no-print lg:hidden">
+          two-column hero already blends into the page. `relative z-20` lifts it
+          above the absolutely-positioned backdrop/wash layers, which would
+          otherwise paint over this static in-flow element. */}
+      <div className="relative z-20 no-print lg:hidden">
         <BrandStrip />
       </div>
     </section>
