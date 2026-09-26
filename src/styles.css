@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+/* Client hero design, scoped under .tvk-hero (see src/styles/hero.css). */
+@import "./styles/hero.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -111,7 +113,7 @@
   }
 }
 
-/* Tricolour brand strip: red / green / gold */
+/* Tricolour brand strip: gold / green / red */
 @utility brand-strip {
   display: flex;
   width: 100%;
@@ -123,7 +125,7 @@
   }
 
   & > span:nth-child(1) {
-    background: var(--primary);
+    background: var(--gold);
   }
 
   & > span:nth-child(2) {
@@ -131,7 +133,7 @@
   }
 
   & > span:nth-child(3) {
-    background: var(--gold);
+    background: var(--primary);
   }
 }
 

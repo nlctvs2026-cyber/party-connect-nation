@@ -1,13 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { Menu } from "lucide-react";
+import { useState, type ReactNode } from "react";
 
 import partyFlag from "@/assets/favicon.jpeg";
 import { BrandStrip } from "./BrandStrip";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { useI18n } from "@/i18n";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navItems = [
+    { to: "/", label: t("nav.home") },
+    { to: "/enroll", label: t("nav.enroll") },
+    { to: "/card", label: t("nav.card") },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -27,14 +36,54 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               <span className="block text-xs text-muted-foreground">{t("app.fullName")}</span>
             </span>
           </Link>
-          <nav className="ml-auto flex flex-wrap items-center gap-1 text-sm">
-            <HeaderLink to="/">{t("nav.home")}</HeaderLink>
-            <HeaderLink to="/enroll">{t("nav.enroll")}</HeaderLink>
-            <HeaderLink to="/card">{t("nav.card")}</HeaderLink>
+          {/* Desktop nav */}
+          <nav className="ml-auto hidden items-center gap-1 text-sm md:flex">
+            {navItems.map((item) => (
+              <HeaderLink key={item.to} to={item.to}>
+                {item.label}
+              </HeaderLink>
+            ))}
             <span className="ml-2">
               <LanguageSwitcher />
             </span>
           </nav>
+
+          {/* Mobile hamburger */}
+          <div className="ml-auto md:hidden">
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t("nav.menu")}
+                  aria-expanded={menuOpen}
+                  className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-md border border-border text-foreground transition-colors hover:bg-muted"
+                >
+                  <Menu className="h-6 w-6" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="flex w-4/5 flex-col sm:max-w-xs">
+                <SheetTitle className="pr-8">{t("nav.menu")}</SheetTitle>
+                <nav className="mt-4 flex flex-col gap-1 text-base">
+                  {navItems.map((item) => (
+                    <SheetClose asChild key={item.to}>
+                      <Link
+                        to={item.to}
+                        className="rounded-md px-3 py-3 font-medium text-foreground transition-colors hover:bg-muted"
+                        activeProps={{ className: "bg-muted text-primary" }}
+                        activeOptions={{ exact: item.to === "/" }}
+                      >
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </nav>
+                <div className="mt-6 border-t border-border pt-6">
+                  <p className="mb-2 text-xs text-muted-foreground">{t("nav.language")}</p>
+                  <LanguageSwitcher />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 

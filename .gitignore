@@ -34,5 +34,8 @@ dist-ssr
 # Supabase CLI local state
 supabase/.temp/
 
+# Client asset drop folder (live copies live in src/assets/hero + src/styles/hero.css)
+hero-static/
+
 # This project uses Bun (bun.lock) — don't commit npm's lockfile
 package-lock.json

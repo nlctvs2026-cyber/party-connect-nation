@@ -26,7 +26,8 @@
     "home": "Home",
     "enroll": "Enroll Member",
     "card": "View Member Card",
-    "language": "Language"
+    "language": "Language",
+    "menu": "Menu"
   },
   "home": {
     "eyebrow": "Official Membership Enrollment",
@@ -34,6 +35,16 @@
     "subtitle": "Enroll as a party member, get verified by the district office, and receive a digital membership card with a scannable verification code.",
     "cta": "Enroll as a member",
     "secondaryCta": "View my member card",
+    "hero": {
+      "tagline": "People | Rights | Progress",
+      "script": "Our right\nOur life",
+      "cta": "Join us",
+      "leaderAlt": "Party leader",
+      "iconValluvar": "Thiruvalluvar",
+      "iconPeriyar": "Periyar",
+      "iconAmbedkar": "Ambedkar",
+      "iconMarx": "Marx"
+    },
     "steps": {
       "title": "How enrollment works",
       "one": "Submit your enrollment",

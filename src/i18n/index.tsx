@@ -27,7 +27,9 @@ interface I18nValue {
 const I18nContext = createContext<I18nValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  // Default language is Tamil; a visitor's saved choice (EN or TA) is applied
+  // on mount from localStorage.
+  const [language, setLanguageState] = useState<Language>("ta");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
