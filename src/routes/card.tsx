@@ -44,6 +44,7 @@ function CardLookupPage() {
 
 function TrackingForm() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [result, setResult] = useState<TrackingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +63,13 @@ function TrackingForm() {
     setLoading(true);
     try {
       const tracked = await trackApplication(digits);
+      // No intermediate "welcome" screen — go straight to the member's card
+      // page. The details panel below is only a fallback for the rare member
+      // without an active card token.
+      if (tracked.status === "member" && tracked.publicToken) {
+        void navigate({ to: "/verify/$token", params: { token: tracked.publicToken } });
+        return;
+      }
       setResult(tracked);
     } catch {
       setError(t("common.error"));
