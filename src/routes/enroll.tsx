@@ -85,7 +85,6 @@ function EnrollPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ crfNo: string; publicToken: string } | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoNote, setPhotoNote] = useState<string | null>(null);
   // BUG-008: the constituency is picked from the selected district's own
@@ -151,7 +150,10 @@ function EnrollPage() {
         dateOfBirth,
         photo,
       });
-      setResult(created);
+      // No intermediate confirmation screen — go straight to the member's
+      // card page (the phone is stored in the DB, so /card lookup still
+      // works later on).
+      void navigate({ to: "/verify/$token", params: { token: created.publicToken } });
     } catch (error) {
       if (error instanceof PhoneTakenError) {
         setErrors({ phone: t("enroll.errors.phoneTaken") });
@@ -161,50 +163,6 @@ function EnrollPage() {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (result) {
-    return (
-      <SiteLayout>
-        <div className="mx-auto max-w-xl px-4 py-20 text-center">
-          <div className="panel p-10">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success text-2xl text-success-foreground">
-              ✓
-            </span>
-            <h1 className="mt-5 text-2xl text-primary">{t("enroll.successTitle")}</h1>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {t("enroll.successBody")}
-            </p>
-            <p className="mt-4 font-mono text-lg tracking-widest text-primary">{result.crfNo}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{t("enroll.crfNote")}</p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={() =>
-                  void navigate({ to: "/verify/$token", params: { token: result.publicToken } })
-                }
-                className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
-              >
-                {t("enroll.viewCardNow")}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setResult(null);
-                  setPhoto(null);
-                  setPhotoNote(null);
-                  setDistrict("");
-                  setConstituency("");
-                }}
-                className="rounded-md border border-primary px-5 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
-              >
-                {t("enroll.again")}
-              </button>
-            </div>
-          </div>
-        </div>
-      </SiteLayout>
-    );
   }
 
   return (
