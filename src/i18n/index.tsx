@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
 import en from "./language-en.json";
 import ta from "./language-ta.json";
@@ -7,6 +7,22 @@ export type Language = "en" | "ta";
 
 const DICTIONARIES: Record<Language, unknown> = { en, ta };
 const STORAGE_KEY = "party.lang";
+
+/**
+ * Tamil is the site default on every fresh visit. A language picked with the
+ * switcher lasts for the browsing session (per tab) only, so the first paint
+ * already has the right language — no default-then-flip flash.
+ */
+function initialLanguage(): Language {
+  if (typeof window === "undefined") return "ta";
+  try {
+    const stored = window.sessionStorage.getItem(STORAGE_KEY);
+    if (stored === "en" || stored === "ta") return stored;
+  } catch {
+    // Storage unavailable (e.g. private mode) — fall back to the default.
+  }
+  return "ta";
+}
 
 function lookup(dict: unknown, key: string): string | undefined {
   const value = key.split(".").reduce<unknown>((acc, part) => {
@@ -27,18 +43,15 @@ interface I18nValue {
 const I18nContext = createContext<I18nValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // Default language is Tamil; a visitor's saved choice (EN or TA) is applied
-  // on mount from localStorage.
-  const [language, setLanguageState] = useState<Language>("ta");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "ta") setLanguageState(stored);
-  }, []);
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    window.localStorage.setItem(STORAGE_KEY, lang);
+    try {
+      window.sessionStorage.setItem(STORAGE_KEY, lang);
+    } catch {
+      // Ignore storage failures — the in-memory choice still applies.
+    }
   }, []);
 
   const t = useCallback(
