@@ -8,10 +8,16 @@ import {
   ALLOWED_PHOTO_TYPES,
   FIXED_STATE,
   MAX_PHOTO_BYTES,
+  POSTING_OPTIONS,
   TAMIL_NADU_CONSTITUENCIES,
   TAMIL_NADU_DISTRICTS,
 } from "@/lib/constants";
-import { PhoneTakenError, phoneCanApply, submitEnrollment } from "@/services/membership";
+import {
+  CpfTakenError,
+  PhoneTakenError,
+  phoneCanApply,
+  submitEnrollment,
+} from "@/services/membership";
 
 export const Route = createFileRoute("/enroll")({
   head: () => ({
@@ -39,6 +45,7 @@ interface FieldErrors {
   address?: string;
   district?: string;
   constituency?: string;
+  cpf?: string;
   photo?: string;
 }
 
@@ -111,12 +118,16 @@ function EnrollPage() {
     const district = String(form.get("district") ?? "");
     const constituency = String(form.get("constituency") ?? "").trim();
     const dateOfBirth = String(form.get("dateOfBirth") ?? "");
+    const cpfNo = String(form.get("cpfNo") ?? "").trim();
+    const posting = String(form.get("posting") ?? "");
 
     const next: FieldErrors = {};
     if (fullName.length < 2 || NAME_INVALID.test(fullName)) {
       next.fullName = t("enroll.errors.fullName");
     }
     if (!VALID_PHONE.test(phone)) next.phone = t("enroll.errors.phone");
+    // CPF number is provided by the applicant (client requirement).
+    if (cpfNo.length < 3) next.cpf = t("enroll.errors.cpf");
     if (address.length < 5) next.address = t("enroll.errors.address");
     if (!district) next.district = t("enroll.errors.district");
     if (constituency.length < 2) next.constituency = t("enroll.errors.constituency");
@@ -149,13 +160,17 @@ function EnrollPage() {
         constituency,
         dateOfBirth,
         photo,
+        cpfNo,
+        posting,
       });
       // No intermediate confirmation screen — go straight to the member's
       // card page (the phone is stored in the DB, so /card lookup still
       // works later on).
       void navigate({ to: "/verify/$token", params: { token: created.publicToken } });
     } catch (error) {
-      if (error instanceof PhoneTakenError) {
+      if (error instanceof CpfTakenError) {
+        setErrors({ cpf: t("enroll.errors.cpfTaken") });
+      } else if (error instanceof PhoneTakenError) {
         setErrors({ phone: t("enroll.errors.phoneTaken") });
       } else {
         setFormError(t("enroll.errors.generic"));
@@ -214,6 +229,34 @@ function EnrollPage() {
                 className={inputClass}
                 autoComplete="bday"
               />
+            </Field>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label={t("enroll.cpf")} hint={t("enroll.cpfHint")} error={errors.cpf}>
+              <input
+                name="cpfNo"
+                type="text"
+                maxLength={30}
+                className={inputClass}
+                onInput={(event) => {
+                  // CPF numbers are uppercase on the party document.
+                  const input = event.currentTarget;
+                  const cleaned = input.value.toUpperCase();
+                  if (cleaned !== input.value) input.value = cleaned;
+                }}
+              />
+            </Field>
+
+            <Field label={t("enroll.posting")}>
+              <select name="posting" className={inputClass} defaultValue="">
+                <option value="">{t("enroll.postingSelect")}</option>
+                {POSTING_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </Field>
           </div>
 

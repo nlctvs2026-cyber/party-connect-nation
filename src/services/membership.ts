@@ -15,13 +15,25 @@ export interface EnrollmentInput {
   /** ISO date (yyyy-mm-dd), required — applicants must be 18 or older. */
   dateOfBirth: string;
   photo: File;
+  /** Client-assigned party number (the client calls it CPF). Required. */
+  cpfNo: string;
+  /** Optional posting in the party (Member, Sub-leader, ...). */
+  posting: string;
 }
 
-/** Thrown when a phone number already has a pending/approved application. */
+/** Thrown when a phone number is already enrolled. */
 export class PhoneTakenError extends Error {
   constructor() {
-    super("phone already has an active application");
+    super("phone is already enrolled");
     this.name = "PhoneTakenError";
+  }
+}
+
+/** Thrown when the provided CPF number already belongs to another member. */
+export class CpfTakenError extends Error {
+  constructor() {
+    super("cpf number is already registered");
+    this.name = "CpfTakenError";
   }
 }
 
@@ -31,7 +43,9 @@ export type TrackingResult =
   | {
       status: "member";
       fullName: string;
-      crfNo: string | null;
+      memberNumber: number | null;
+      cpfNo: string | null;
+      posting: string | null;
       district: string;
       constituency: string;
       joinedAt: string;
@@ -44,7 +58,9 @@ export type MemberResult = Extract<TrackingResult, { status: "member" }>;
 interface TrackRpcPayload {
   status?: string;
   full_name?: string | null;
-  crf_no?: string | null;
+  member_number?: number | null;
+  cpf_no?: string | null;
+  posting?: string | null;
   district?: string | null;
   constituency?: string | null;
   joined_at?: string | null;
@@ -67,7 +83,9 @@ export async function trackApplication(phone: string): Promise<TrackingResult> {
   return {
     status: "member",
     fullName: p.full_name ?? "",
-    crfNo: p.crf_no ?? null,
+    memberNumber: p.member_number ?? null,
+    cpfNo: p.cpf_no ?? null,
+    posting: p.posting ?? null,
     district: p.district ?? "",
     constituency: p.constituency ?? "",
     joinedAt: p.joined_at ?? "",
@@ -89,7 +107,9 @@ export async function phoneCanApply(phone: string): Promise<boolean> {
 export interface CardVerification {
   valid: boolean;
   full_name: string;
-  crf_no: string;
+  member_number: number;
+  cpf_no: string;
+  posting: string | null;
   district: string;
   state: string;
   constituency: string;
@@ -106,15 +126,17 @@ function photoExtension(file: File): string {
 
 /** The newly created member identity, returned by an instant enrollment. */
 export interface EnrollmentResult {
-  crfNo: string;
+  memberNumber: number;
+  cpfNo: string;
   publicToken: string;
 }
 
 /**
  * Anonymous instant enrollment: upload the photo to the private bucket, then
- * create member + CRF number + card token in one database transaction. The
- * unique phone constraint makes duplicate submissions impossible, so the card
- * can be shown immediately — there is no review step.
+ * create member + card token in one database transaction. The CPF number is
+ * provided by the applicant; the member number is assigned by the database.
+ * Unique constraints on phone and CPF make duplicate submissions impossible,
+ * so the card can be shown immediately — there is no review step.
  */
 export async function submitEnrollment(input: EnrollmentInput): Promise<EnrollmentResult> {
   const path = `applications/${crypto.randomUUID()}.${photoExtension(input.photo)}`;
@@ -132,20 +154,26 @@ export async function submitEnrollment(input: EnrollmentInput): Promise<Enrollme
     _constituency: input.constituency.trim(),
     _date_of_birth: input.dateOfBirth,
     _photo_path: path,
+    _cpf_no: input.cpfNo.trim(),
+    _posting: input.posting,
   });
   if (error) {
-    // The unique phone constraint is the last line of defense against
-    // duplicates. Surface it as a typed error the form can show a friendly
-    // message for. (An orphaned photo in the private bucket is harmless —
-    // nothing references it without a member row.)
-    if (error.code === "23505" || /duplicate key|unique constraint/i.test(error.message)) {
+    // The unique constraints are the last line of defense against duplicate
+    // phones and reused CPF numbers. Surface them as typed errors the form can
+    // show a friendly message for. (An orphaned photo in the private bucket is
+    // harmless — nothing references it without a member row.)
+    if (/cpf already in use/i.test(error.message)) {
+      throw new CpfTakenError();
+    }
+    if (error.code === "23505" || /duplicate key|unique constraint|phone already enrolled/i.test(error.message)) {
       throw new PhoneTakenError();
     }
     throw error;
   }
-  const payload = (data ?? {}) as { crf_no?: string; public_token?: string };
+  const payload = (data ?? {}) as { member_number?: number; cpf_no?: string; public_token?: string };
   return {
-    crfNo: payload.crf_no ?? "",
+    memberNumber: payload.member_number ?? 0,
+    cpfNo: payload.cpf_no ?? "",
     publicToken: payload.public_token ?? "",
   };
 }

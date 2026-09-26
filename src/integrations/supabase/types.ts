@@ -81,15 +81,17 @@ export type Database = {
           address: string
           constituency: string
           created_at: string
-          crf_no: string
+          cpf_no: string
           date_of_birth: string | null
           district: string
           full_name: string
           id: string
           is_active: boolean
           joined_at: string
+          member_number: number
           phone: string
           photo_path: string | null
+          posting: string | null
           state: string
           user_id: string | null
         }
@@ -97,15 +99,17 @@ export type Database = {
           address: string
           constituency: string
           created_at?: string
-          crf_no: string
+          cpf_no: string
           date_of_birth?: string | null
           district: string
           full_name: string
           id?: string
           is_active?: boolean
           joined_at?: string
+          member_number?: number
           phone: string
           photo_path?: string | null
+          posting?: string | null
           state?: string
           user_id?: string | null
         }
@@ -113,15 +117,17 @@ export type Database = {
           address?: string
           constituency?: string
           created_at?: string
-          crf_no?: string
+          cpf_no?: string
           date_of_birth?: string | null
           district?: string
           full_name?: string
           id?: string
           is_active?: boolean
           joined_at?: string
+          member_number?: number
           phone?: string
           photo_path?: string | null
+          posting?: string | null
           state?: string
           user_id?: string | null
         }

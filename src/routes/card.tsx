@@ -127,7 +127,11 @@ function MemberStatus({ result, onBack }: { result: MemberResult; onBack: () => 
       <h1 className="mt-5 text-2xl text-primary">{t("card.status.member")}</h1>
       <dl className="mt-6 space-y-2 text-left text-sm">
         <Row label={t("common.name")} value={result.fullName} />
-        {result.crfNo ? <Row label={t("admin.members.crf")} value={result.crfNo} /> : null}
+        {result.memberNumber !== null ? (
+          <Row label={t("card.memberNo")} value={String(result.memberNumber).padStart(6, "0")} />
+        ) : null}
+        {result.cpfNo ? <Row label={t("card.cpf")} value={result.cpfNo} /> : null}
+        {result.posting ? <Row label={t("card.posting")} value={result.posting} /> : null}
         <Row
           label={t("card.status.districtLabel")}
           value={`${result.district} · ${result.constituency}`}

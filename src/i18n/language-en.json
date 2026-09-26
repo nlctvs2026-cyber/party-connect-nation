@@ -52,7 +52,7 @@
       "two": "Card issued instantly",
       "twoBody": "Your membership is confirmed right away — no waiting for office review.",
       "three": "Carry your card",
-      "threeBody": "A unique CRF number is issued and your card is ready to print or share."
+      "threeBody": "Your details are saved and your card is ready to print or share."
     }
   },
   "enroll": {
@@ -70,24 +70,25 @@
     "constituency": "Constituency (Thogudhi)",
     "constituencySelect": "Select constituency",
     "constituencyPickDistrict": "Select a district first",
+    "cpf": "CPF number",
+    "cpfHint": "Printed on your party document",
+    "posting": "Posting",
+    "postingSelect": "Select posting",
     "photo": "Profile photo",
     "photoHint": "JPG or PNG, up to 5 MB",
     "submit": "Submit enrollment",
     "submitting": "Submitting...",
-    "successTitle": "You are a member!",
-    "successBody": "Your membership card has been issued instantly. Your CRF number:",
-    "crfNote": "Keep this number — you can always find your card with your mobile number.",
-    "viewCardNow": "View your membership card",
-    "again": "Enroll another member",
     "errors": {
       "fullName": "Enter your full name using letters only (no numbers or special characters).",
       "phone": "Enter a valid 10-digit Indian mobile number (starting 6-9).",
+      "cpf": "Enter your CPF number.",
+      "cpfTaken": "This CPF number is already registered to another member.",
       "address": "Please enter your address.",
       "district": "Please select your district.",
       "constituency": "Please enter your constituency.",
       "dob": "Please enter your date of birth.",
       "dobAge": "You must be at least 18 years old.",
-      "phoneTaken": "This mobile number already has an application. Use it on the tracking page to check your status.",
+      "phoneTaken": "This mobile number is already enrolled. Use it on the card page to find the member's card.",
       "photo": "Please upload a photo (JPG or PNG, max 5 MB).",
       "generic": "Could not submit your enrollment. Please try again."
     }
@@ -116,7 +117,9 @@
     "verified": "Verified active member",
     "revoked": "This membership is not active",
     "verificationTitle": "Membership verification",
-    "crf": "CRF number",
+    "cpf": "CPF number",
+    "posting": "Posting",
+    "memberNo": "Member No",
     "district": "District",
     "constituency": "Constituency",
     "state": "State",
@@ -139,9 +142,11 @@
     },
     "members": {
       "empty": "No approved members yet.",
-      "search": "Search by name, CRF or district",
+      "search": "Search by name, CPF or district",
       "viewCard": "View card",
-      "crf": "CRF"
+      "cpf": "CPF",
+      "posting": "Posting",
+      "memberNo": "Member No"
     },
     "templates": {
       "empty": "No templates uploaded.",

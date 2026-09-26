@@ -19,7 +19,13 @@ export function MembersList() {
     const term = search.trim().toLowerCase();
     if (!term || !data) return data ?? [];
     return data.filter((member) =>
-      [member.full_name, member.crf_no, member.district, member.constituency]
+      [
+        member.full_name,
+        member.cpf_no,
+        member.member_number !== null ? String(member.member_number).padStart(6, "0") : "",
+        member.district,
+        member.constituency,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(term),
@@ -56,7 +62,9 @@ export function MembersList() {
             <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="break-anywhere px-4 py-3">{t("common.name")}</th>
-                <th className="break-anywhere px-4 py-3">{t("admin.members.crf")}</th>
+                <th className="break-anywhere px-4 py-3">{t("admin.members.memberNo")}</th>
+                <th className="break-anywhere px-4 py-3">{t("admin.members.cpf")}</th>
+                <th className="break-anywhere px-4 py-3">{t("admin.members.posting")}</th>
                 <th className="break-anywhere px-4 py-3">{t("common.phone")}</th>
                 <th className="break-anywhere px-4 py-3">{t("card.district")}</th>
                 <th className="break-anywhere px-4 py-3">{t("card.constituency")}</th>
@@ -70,7 +78,13 @@ export function MembersList() {
                 return (
                   <tr key={member.id} className="border-t border-border">
                     <td className="break-anywhere px-4 py-3 font-medium">{member.full_name}</td>
-                    <td className="break-anywhere px-4 py-3">{member.crf_no}</td>
+                    <td className="break-anywhere px-4 py-3">
+                      {member.member_number !== null
+                        ? String(member.member_number).padStart(6, "0")
+                        : ""}
+                    </td>
+                    <td className="break-anywhere px-4 py-3">{member.cpf_no}</td>
+                    <td className="break-anywhere px-4 py-3">{member.posting ?? ""}</td>
                     <td className="break-anywhere px-4 py-3">{member.phone}</td>
                     <td className="break-anywhere px-4 py-3">{member.district}</td>
                     <td className="break-anywhere px-4 py-3">{member.constituency}</td>
