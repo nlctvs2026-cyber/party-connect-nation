@@ -10,6 +10,7 @@ export const CARD_PLACEHOLDERS = [
   "member_number",
   "cpf_no",
   "posting",
+  "date_of_birth",
   "phone",
   "address",
   "district",
@@ -50,8 +51,8 @@ export const STARTER_TEMPLATE = `<!--
   Edit this file, then upload it in /admin -> Card templates.
 
   Supported placeholders - each {{token}} is replaced with live member data:
-    {{name}}  {{member_number}}  {{cpf_no}}  {{posting}}  {{phone}}  {{address}}
-    {{district}}  {{state}}  {{constituency}}  {{photo}}  {{qr_code}}
+    {{name}}  {{member_number}}  {{cpf_no}}  {{posting}}  {{date_of_birth}}  {{phone}}
+    {{address}}  {{district}}  {{state}}  {{constituency}}  {{photo}}  {{qr_code}}
 
   Notes:
   - Values are HTML-escaped and unknown tokens render as empty text.
@@ -71,6 +72,7 @@ export const STARTER_TEMPLATE = `<!--
       <div><b>Member No:</b> {{member_number}}</div>
       <div><b>CPF No:</b> {{cpf_no}}</div>
       <div><b>Posting:</b> {{posting}}</div>
+      <div><b>Date of birth:</b> {{date_of_birth}}</div>
       <div><b>Phone:</b> {{phone}}</div>
       <div><b>Address:</b> {{address}}</div>
       <div><b>District:</b> {{district}}</div>
@@ -115,6 +117,7 @@ export const PREVIEW_VALUES: CardValues = {
   member_number: "000042",
   cpf_no: "CPF-2026-001001",
   posting: "Member",
+  date_of_birth: "1990-06-15",
   phone: "9000000000",
   address: "12, Gandhi Street, Anna Nagar",
   district: "Madurai",

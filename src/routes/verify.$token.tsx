@@ -107,6 +107,7 @@ function VerifyPage() {
               member_number: String(data.member_number),
               cpf_no: data.cpf_no,
               posting: data.posting ?? "",
+              date_of_birth: data.date_of_birth ?? "",
               district: data.district,
               state: data.state,
               constituency: data.constituency,

@@ -110,6 +110,7 @@ export interface CardVerification {
   member_number: number;
   cpf_no: string;
   posting: string | null;
+  date_of_birth: string | null;
   district: string;
   state: string;
   constituency: string;
