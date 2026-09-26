@@ -142,11 +142,15 @@
     },
     "members": {
       "empty": "No approved members yet.",
-      "search": "Search by name, CPF or district",
+      "search": "Search by name, CPF, phone, district…",
       "viewCard": "View card",
       "cpf": "CPF",
       "posting": "Posting",
-      "memberNo": "Member No"
+      "memberNo": "Member No",
+      "count": "{total} members",
+      "pageInfo": "Page {page} of {pages}",
+      "prev": "Prev",
+      "next": "Next"
     },
     "templates": {
       "empty": "No templates uploaded.",

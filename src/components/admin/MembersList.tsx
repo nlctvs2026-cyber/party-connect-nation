@@ -1,38 +1,41 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useI18n } from "@/i18n";
 import { formatDate } from "@/lib/format";
-import { listMembers } from "@/services/admin";
+import { listMembersPage, MEMBER_PAGE_SIZE } from "@/services/admin";
 
 export function MembersList() {
   const { t, language } = useI18n();
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
 
-  const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["members"],
-    queryFn: listMembers,
+  // Debounce the search box: only hit the server 300ms after typing stops.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0); // a new search always restarts at page 1
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const { data, isPending, isError, isFetching, refetch } = useQuery({
+    queryKey: ["members", page, search],
+    queryFn: () => listMembersPage(page, search),
+    placeholderData: (previous) => previous, // keep the old page visible while fetching
   });
 
-  const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term || !data) return data ?? [];
-    return data.filter((member) =>
-      [
-        member.full_name,
-        member.cpf_no,
-        member.member_number !== null ? String(member.member_number).padStart(6, "0") : "",
-        member.district,
-        member.constituency,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(term),
-    );
-  }, [data, search]);
+  const members = data?.members ?? [];
+  const total = data?.total ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / MEMBER_PAGE_SIZE));
+  const rangeStart = total === 0 ? 0 : page * MEMBER_PAGE_SIZE + 1;
+  const rangeEnd = Math.min(total, (page + 1) * MEMBER_PAGE_SIZE);
 
-  if (isPending) return <p className="text-sm text-muted-foreground">{t("common.loading")}</p>;
+  if (isPending && !data) {
+    return <p className="text-sm text-muted-foreground">{t("common.loading")}</p>;
+  }
   if (isError) {
     return (
       <div className="text-sm">
@@ -46,15 +49,21 @@ export function MembersList() {
 
   return (
     <div className="space-y-4">
-      <input
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder={t("admin.members.search")}
-        maxLength={80}
-        className="w-full max-w-sm rounded-md border border-input bg-card px-3 py-2 text-sm"
-      />
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          value={searchInput}
+          onChange={(event) => setSearchInput(event.target.value)}
+          placeholder={t("admin.members.search")}
+          maxLength={80}
+          className="w-full max-w-sm rounded-md border border-input bg-card px-3 py-2 text-sm"
+        />
+        <span className="text-xs text-muted-foreground">
+          {t("admin.members.count").replace("{total}", String(total))}
+        </span>
+        {isFetching ? <span className="text-xs text-muted-foreground">…</span> : null}
+      </div>
 
-      {filtered.length === 0 ? (
+      {members.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("admin.members.empty")}</p>
       ) : (
         <div className="panel overflow-x-auto">
@@ -73,7 +82,7 @@ export function MembersList() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((member) => {
+              {members.map((member) => {
                 const token = member.member_cards?.public_token;
                 return (
                   <tr key={member.id} className="border-t border-border">
@@ -108,6 +117,50 @@ export function MembersList() {
           </table>
         </div>
       )}
+
+      {pageCount > 1 || total > MEMBER_PAGE_SIZE ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">
+            {t("admin.members.pageInfo")
+              .replace("{page}", String(page + 1))
+              .replace("{pages}", String(pageCount))}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage(0)}
+              disabled={page === 0 || isFetching}
+              className="rounded-md border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+            >
+              «
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((current) => Math.max(0, current - 1))}
+              disabled={page === 0 || isFetching}
+              className="rounded-md border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+            >
+              ‹ {t("admin.members.prev")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((current) => Math.min(pageCount - 1, current + 1))}
+              disabled={page >= pageCount - 1 || isFetching}
+              className="rounded-md border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+            >
+              {t("admin.members.next")} ›
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage(pageCount - 1)}
+              disabled={page >= pageCount - 1 || isFetching}
+              className="rounded-md border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+            >
+              »
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
