@@ -87,7 +87,10 @@ function VerifyPage() {
 
             <dl className="mt-6 grid gap-4 break-anywhere sm:grid-cols-2">
               <Detail label={t("common.name")} value={data.full_name} />
-              <Detail label={t("card.memberNo")} value={String(data.member_number)} />
+              <Detail
+                label={t("card.memberNo")}
+                value={String(data.member_number).padStart(6, "0")}
+              />
               <Detail label={t("card.cpf")} value={data.cpf_no} />
               {data.posting ? <Detail label={t("card.posting")} value={data.posting} /> : null}
               <Detail label={t("card.district")} value={data.district} />
@@ -104,7 +107,7 @@ function VerifyPage() {
             token={token}
             values={{
               name: data.full_name,
-              member_number: String(data.member_number),
+              member_number: String(data.member_number).padStart(6, "0"),
               cpf_no: data.cpf_no,
               posting: data.posting ?? "",
               date_of_birth: data.date_of_birth ?? "",
