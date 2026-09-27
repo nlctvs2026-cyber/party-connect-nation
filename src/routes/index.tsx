@@ -79,7 +79,6 @@ function HomePage() {
                 ["about.facts.founded", "about.facts.foundedValue"],
                 ["about.facts.ideology", "about.facts.ideologyValue"],
                 ["about.facts.headquarters", "about.facts.headquartersValue"],
-                ["about.facts.secretary", "about.facts.secretaryValue"],
               ] as [string, string][]).map(([labelKey, valueKey]: [string, string]) => (
                 <div key={labelKey} className="panel p-4">
                   <dt className="text-xs uppercase tracking-wide text-muted-foreground">

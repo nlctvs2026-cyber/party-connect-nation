@@ -254,7 +254,9 @@
 }
 
 .tvk-hero .hero-script {
-  margin-top: 1.5rem;
+  /* Slogan (மக்கள் | உரிமை | முன்னேற்றம்) removed per QA BUG-011; the
+     script block moves up into its place, pulled in a touch tighter. */
+  margin-top: 1.25rem;
   /* The two tagline lines come through i18n as one string with \n. */
   white-space: pre-line;
   transform: rotate(-3deg);

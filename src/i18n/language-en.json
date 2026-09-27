@@ -7,7 +7,7 @@
   },
   "about": {
     "title": "About the party",
-    "body": "Tamizhaga Vazhvurimai Katchi (TVK) is a regional political party in Tamil Nadu, founded in January 2012 by T. Velmurugan after splitting from the Pattali Makkal Katchi. The party was launched in Chennai during Pongal and works for Tamil identity, social justice and regional development.",
+    "body": "Tamizhaga Vazhvurimai Katchi (TVS) is a regional political party in Tamil Nadu, founded in January 2012 by T. Velmurugan after splitting from the Pattali Makkal Katchi. The party was launched in Chennai during Pongal and works for Tamil identity, social justice and regional development.",
     "founderTitle": "Founder & Leader",
     "founderName": "T. Velmurugan",
     "founderBody": "Founder and leader of Tamizhaga Vazhvurimai Katchi. He has served as a Member of the Tamil Nadu Legislative Assembly representing the Panruti constituency, and was previously associated with the Pattali Makkal Katchi before founding the party in 2012.",
@@ -17,9 +17,7 @@
       "ideology": "Ideology",
       "ideologyValue": "Tamil nationalism · Social justice",
       "headquarters": "Headquarters",
-      "headquartersValue": "Tamil Nadu, India",
-      "secretary": "State Secretary",
-      "secretaryValue": "Mahendran H"
+      "headquartersValue": "Tamil Nadu, India"
     }
   },
   "nav": {

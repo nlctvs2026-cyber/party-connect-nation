@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Fragment } from "react";
 
 import { BrandStrip } from "@/components/BrandStrip";
 import { useI18n } from "@/i18n";
@@ -22,10 +21,6 @@ import valluvar from "@/assets/hero/img/valluvar.png";
  */
 export function TvkHero() {
   const { t } = useI18n();
-
-  // The tagline is "A | B | C" in every language; rebuild it with the
-  // client's styled separators.
-  const taglineParts = t("home.hero.tagline").split("|");
 
   return (
     <section className="tvk-hero">
@@ -55,15 +50,6 @@ export function TvkHero() {
           <img className="hero-emblem" src={emblem} alt={t("app.fullName")} />
 
           <h1 className="hero-title">{t("app.fullName")}</h1>
-
-          <p className="hero-tagline">
-            {taglineParts.map((part, index) => (
-              <Fragment key={index}>
-                {index > 0 && <span className="sep">|</span>}
-                {part.trim()}
-              </Fragment>
-            ))}
-          </p>
 
           <p className="hero-script">{t("home.hero.script")}</p>
 
