@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { BrandStrip } from "@/components/BrandStrip";
 import { MembershipCard } from "@/components/MembershipCard";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useI18n } from "@/i18n";
+import { downloadCardHtml } from "@/lib/card-download";
 import { formatDate } from "@/lib/format";
 import { memberPhotoUrl, verifyCard } from "@/services/membership";
 
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/verify/$token")({
 function VerifyPage() {
   const { token } = Route.useParams();
   const { t, language } = useI18n();
+  const [downloading, setDownloading] = useState(false);
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["verify-card", token],
@@ -123,13 +126,22 @@ function VerifyPage() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => window.print()}
-              className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              disabled={downloading}
+              onClick={async () => {
+                const card = document.querySelector("#membership-card");
+                if (!card) return;
+                setDownloading(true);
+                try {
+                  await downloadCardHtml(card.innerHTML);
+                } finally {
+                  setDownloading(false);
+                }
+              }}
+              className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
-              {t("card.print")}
+              {downloading ? t("card.downloading") : t("card.download")}
             </button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">{t("card.printNote")}</p>
         </div>
       </div>
     </SiteLayout>
