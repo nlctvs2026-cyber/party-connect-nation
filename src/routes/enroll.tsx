@@ -9,7 +9,6 @@ import {
   ALLOWED_PHOTO_TYPES,
   FIXED_STATE,
   MAX_PHOTO_BYTES,
-  TAMIL_NADU_CONSTITUENCIES,
   TAMIL_NADU_DISTRICTS,
 } from "@/lib/constants";
 import {
@@ -94,12 +93,7 @@ function EnrollPage() {
   const [submitting, setSubmitting] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoNote, setPhotoNote] = useState<string | null>(null);
-  // BUG-008: the constituency is picked from the selected district's own
-  // list, so the district/constituency pair can never mismatch or be
-  // misspelled.
   const [district, setDistrict] = useState("");
-  const [constituency, setConstituency] = useState("");
-  const districtConstituencies = TAMIL_NADU_CONSTITUENCIES[district] ?? [];
   // Date-picker ceiling: applicants must already be 18 (today minus 18 years).
   const [dobMax] = useState(() => {
     const cutoff = new Date();
@@ -277,7 +271,6 @@ function EnrollPage() {
                 value={district}
                 onChange={(event) => {
                   setDistrict(event.target.value);
-                  setConstituency("");
                 }}
               >
                 <option value="" disabled>
@@ -303,22 +296,13 @@ function EnrollPage() {
           </div>
 
           <Field label={t("enroll.constituency")} error={errors.constituency}>
-            <select
+            <input
+              type="text"
               name="constituency"
+              maxLength={70}
               className={inputClass}
-              value={constituency}
-              disabled={!district}
-              onChange={(event) => setConstituency(event.target.value)}
-            >
-              <option value="" disabled>
-                {district ? t("enroll.constituencySelect") : t("enroll.constituencyPickDistrict")}
-              </option>
-              {districtConstituencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+              autoComplete="off"
+            />
           </Field>
 
           <Field label={t("enroll.photo")} hint={t("enroll.photoHint")} error={errors.photo}>
