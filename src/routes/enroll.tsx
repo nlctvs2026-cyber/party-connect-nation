@@ -9,7 +9,6 @@ import {
   ALLOWED_PHOTO_TYPES,
   FIXED_STATE,
   MAX_PHOTO_BYTES,
-  POSTING_OPTIONS,
   TAMIL_NADU_CONSTITUENCIES,
   TAMIL_NADU_DISTRICTS,
 } from "@/lib/constants";
@@ -256,14 +255,13 @@ function EnrollPage() {
             </Field>
 
             <Field label={t("enroll.posting")}>
-              <select name="posting" className={inputClass} defaultValue="">
-                <option value="">{t("enroll.postingSelect")}</option>
-                {POSTING_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <input
+                type="text"
+                name="posting"
+                maxLength={70}
+                className={inputClass}
+                autoComplete="organization-title"
+              />
             </Field>
           </div>
 

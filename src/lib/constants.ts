@@ -1,15 +1,6 @@
 /** The only state this portal accepts enrollments for. */
 export const FIXED_STATE = "Tamil Nadu" as const;
 
-/** Posting options in the enroll form (client request — no "Leader"). */
-export const POSTING_OPTIONS = [
-  "Member",
-  "Sub-leader",
-  "Booth coordinator",
-  "Ward coordinator",
-  "District organizer",
-] as const;
-
 /** Revenue districts of Tamil Nadu. */
 export const TAMIL_NADU_DISTRICTS = [
   "Ariyalur",
