@@ -153,17 +153,12 @@
     background: white;
   }
 
-  /* QA BUG-19: the printed/downloaded file contains the ID card only. Every
-     non-card element on the page carries .no-print (header, strips, footer,
-     buttons, verification panel), so nothing else needs hiding here — a
-     universal selector must NOT be used, since display:none on an ancestor
-     would hide the card subtree as well and produce a blank page. Just make
-     sure the card container never clips its content. */
-  #membership-card {
-    overflow: visible !important;
-  }
-
-  #membership-card * {
-    overflow: visible !important;
-  }
+  /* QA BUG-19: the printed/downloaded file contains the active card template
+     only. Every non-card element on the page carries .no-print (header,
+     strips, footer, buttons, verification panel), so nothing else needs
+     hiding here — a universal selector must NOT be used, since display:none
+     on an ancestor would hide the card subtree as well and produce a blank
+     page. The card container keeps its own overflow, so the template's photo
+     frame crops exactly as it does on screen (the "window" effect) instead
+     of layers overflowing the card in print. */
 }
