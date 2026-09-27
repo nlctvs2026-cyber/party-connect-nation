@@ -153,20 +153,14 @@
     background: white;
   }
 
-  /* QA BUG-19: printing/downloading outputs the ID card only — the page
-     chrome (header, strips, verification panel, buttons) is excluded and the
-     card's front and back sides are emitted together, the back on its own
-     page. */
-  body:has(#membership-card) *:not(#membership-card):not(#membership-card *) {
-    display: none !important;
-  }
-
+  /* QA BUG-19: the printed/downloaded file contains the ID card only. Every
+     non-card element on the page carries .no-print (header, strips, footer,
+     buttons, verification panel), so nothing else needs hiding here — a
+     universal selector must NOT be used, since display:none on an ancestor
+     would hide the card subtree as well and produce a blank page. Just make
+     sure the card container never clips its content. */
   #membership-card {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    overflow: visible;
-    padding: 8px;
+    overflow: visible !important;
   }
 
   #membership-card * {

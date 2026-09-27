@@ -86,7 +86,7 @@ function VerifyPage() {
           }}
         />
 
-        <div className="panel mt-10 overflow-hidden">
+        <div className="panel no-print mt-10 overflow-hidden">
           <BrandStrip />
           <div className="p-6">
             <div className="flex flex-wrap items-center gap-3">
