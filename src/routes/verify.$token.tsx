@@ -69,7 +69,24 @@ function VerifyPage() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-12">
-        <div className="panel overflow-hidden">
+        {/* BUG-16: the ID card leads the page; the verification details panel
+            sits below it. */}
+        <MembershipCard
+          token={token}
+          values={{
+            name: data.full_name,
+            member_number: String(data.member_number).padStart(6, "0"),
+            cpf_no: data.cpf_no,
+            posting: data.posting ?? "",
+            date_of_birth: data.date_of_birth ?? "",
+            district: data.district,
+            state: data.state,
+            constituency: data.constituency,
+            photo: data.photo_path ? memberPhotoUrl(token) : "",
+          }}
+        />
+
+        <div className="panel mt-10 overflow-hidden">
           <BrandStrip />
           <div className="p-6">
             <div className="flex flex-wrap items-center gap-3">
@@ -100,23 +117,6 @@ function VerifyPage() {
             </dl>
             <p className="mt-4 text-xs text-muted-foreground">{t("card.privacyNote")}</p>
           </div>
-        </div>
-
-        <div className="mt-10">
-          <MembershipCard
-            token={token}
-            values={{
-              name: data.full_name,
-              member_number: String(data.member_number).padStart(6, "0"),
-              cpf_no: data.cpf_no,
-              posting: data.posting ?? "",
-              date_of_birth: data.date_of_birth ?? "",
-              district: data.district,
-              state: data.state,
-              constituency: data.constituency,
-              photo: data.photo_path ? memberPhotoUrl(token) : "",
-            }}
-          />
         </div>
 
         <div className="no-print mt-6 flex flex-wrap gap-3">

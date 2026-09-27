@@ -66,6 +66,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function useI18n(): I18nValue {
   const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  if (ctx) return ctx;
+  // No provider in scope — e.g. a component rendered during an HMR swap after
+  // this module was re-evaluated, or an isolated preview. Fall back to the
+  // default language instead of crashing the tree; the next full render gets
+  // the provider again.
+  return {
+    language: "ta",
+    setLanguage: () => {},
+    t: (key: string) => lookup(DICTIONARIES.ta, key) ?? lookup(DICTIONARIES.en, key) ?? key,
+  };
 }
