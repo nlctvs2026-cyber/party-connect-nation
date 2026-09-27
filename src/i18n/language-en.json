@@ -108,6 +108,7 @@
     "notFound": "No membership card found for this code.",
     "loading": "Loading card...",
     "print": "Print / Save as PDF",
+    "printNote": "Printing outputs the card only — front and back sides, one per page.",
     "download": "Download card",
     "verified": "Verified active member",
     "revoked": "This membership is not active",

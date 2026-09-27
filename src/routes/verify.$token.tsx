@@ -119,14 +119,17 @@ function VerifyPage() {
           </div>
         </div>
 
-        <div className="no-print mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            {t("card.print")}
-          </button>
+        <div className="no-print mt-6">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              {t("card.print")}
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">{t("card.printNote")}</p>
         </div>
       </div>
     </SiteLayout>

@@ -152,4 +152,24 @@
   body {
     background: white;
   }
+
+  /* QA BUG-19: printing/downloading outputs the ID card only — the page
+     chrome (header, strips, verification panel, buttons) is excluded and the
+     card's front and back sides are emitted together, the back on its own
+     page. */
+  body:has(#membership-card) *:not(#membership-card):not(#membership-card *) {
+    display: none !important;
+  }
+
+  #membership-card {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    overflow: visible;
+    padding: 8px;
+  }
+
+  #membership-card * {
+    overflow: visible !important;
+  }
 }
