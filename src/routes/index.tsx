@@ -70,7 +70,7 @@ function HomePage() {
               </Link>
               <Link
                 to="/card"
-                className="rounded-md border border-primary px-6 py-3 text-center text-sm font-semibold text-primary transition-colors hover:bg-muted"
+                className="rounded-md border border-bright-red px-6 py-3 text-center text-sm font-semibold text-primary transition-colors hover:bg-muted"
               >
                 {t("home.secondaryCta")}
               </Link>

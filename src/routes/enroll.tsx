@@ -97,7 +97,7 @@ function EnrollPage() {
                   setDone(false);
                   setPhoto(null);
                 }}
-                className="rounded-md border border-primary px-5 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
+                className="rounded-md border border-bright-red px-5 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
               >
                 {t("enroll.again")}
               </button>

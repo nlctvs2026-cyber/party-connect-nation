@@ -237,8 +237,8 @@ CREATE POLICY "admin manages member photos" ON storage.objects FOR ALL TO authen
 -- ============ DEFAULT TEMPLATE ============
 INSERT INTO public.card_templates (name, html, is_active) VALUES (
 'Classic Red & Gold',
-'<div style="width:560px;font-family:Georgia,serif;color:#261611;background:#F3F0C8;border:6px solid #790604;border-radius:14px;overflow:hidden">
-  <div style="display:flex;height:10px"><div style="flex:1;background:#790604"></div><div style="flex:1;background:#246820"></div><div style="flex:1;background:#EBC336"></div></div>
+'<div style="width:560px;font-family:Georgia,serif;color:#261611;background:#F3F0C8;border:6px solid #FF0000;border-radius:14px;overflow:hidden">
+  <div style="display:flex;height:10px"><div style="flex:1;background:#FF0000"></div><div style="flex:1;background:#246820"></div><div style="flex:1;background:#EBC336"></div></div>
   <div style="padding:16px 20px;background:#790604;color:#F3F0C8">
     <div style="font-size:20px;font-weight:bold;letter-spacing:1px">PARTY MEMBERSHIP CARD</div>
     <div style="font-size:12px;opacity:.85">{{state}}</div>
@@ -257,5 +257,5 @@ INSERT INTO public.card_templates (name, html, is_active) VALUES (
       <div style="font-size:9px;color:#693E2C;margin-top:4px">Scan to verify</div>
     </div>
   </div>
-  <div style="display:flex;height:8px"><div style="flex:1;background:#790604"></div><div style="flex:1;background:#246820"></div><div style="flex:1;background:#EBC336"></div></div>
+  <div style="display:flex;height:8px"><div style="flex:1;background:#FF0000"></div><div style="flex:1;background:#246820"></div><div style="flex:1;background:#EBC336"></div></div>
 </div>', true);
