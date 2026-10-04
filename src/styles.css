@@ -24,8 +24,7 @@
 
 /*
  * Design system — party brand palette.
- * Red #790604 (text/fills) · Bright red #FF0000 (borders, focus rings, accent strips)
- * Green #246820 · Gold #EBC336 · Cream #F3F0C8 · Brown #261611 / #693E2C
+ * Red #790604 · Green #246820 · Gold #EBC336 · Cream #F3F0C8 · Brown #261611 / #693E2C
  * All colors are semantic tokens. Never hardcode colors in components.
  */
 
@@ -59,7 +58,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-bright-red: var(--bright-red);
   --color-ring-offset-background: var(--background);
   --color-surface: var(--surface);
   --font-display: "Marcellus", "Noto Serif Tamil", Georgia, serif;
@@ -70,7 +68,6 @@
 
 :root {
   --radius: 0.5rem;
-  --bright-red: #FF0000;
   --background: oklch(0.958 0.042 105.2);
   --foreground: oklch(0.232 0.028 40.1);
   --surface: oklch(0.985 0.018 100);
@@ -94,19 +91,12 @@
   --destructive-foreground: oklch(0.98 0.02 100);
   --border: oklch(0.878 0.045 96);
   --input: oklch(0.878 0.045 96);
-  --ring: var(--bright-red);
+  --ring: oklch(0.362 0.144 28.6);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
-  }
-
-  html,
-  body {
-    /* Safety net: the page must never show a horizontal scrollbar. */
-    max-width: 100%;
-    overflow-x: hidden;
   }
 
   body {
@@ -135,7 +125,7 @@
   }
 
   & > span:nth-child(1) {
-    background: var(--bright-red);
+    background: var(--gold);
   }
 
   & > span:nth-child(2) {
@@ -152,40 +142,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-}
-
-/*
- * Homepage banner — exact image extracted from nlc_banner_exact.html.
- * The standalone file used fixed 1672px × 941px dimensions; here the image
- * stays fluid so it always fits the viewport while keeping its original
- * aspect ratio (no stretching, cropping or distortion, no horizontal scroll).
- */
-.banner-section {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.banner-frame {
-  width: 100%;
-  max-width: 1672px;
-  margin-inline: auto;
-  overflow: hidden;
-}
-
-img.banner {
-  display: block;
-  width: 100%;
-  max-width: 1672px;
-  height: auto;
-  margin: 0 auto;
-}
-
-@media (max-width: 640px) {
-  img.banner {
-    /* Never let the banner push the page wider than the phone screen. */
-    max-width: 100%;
-  }
 }
 
 @media print {

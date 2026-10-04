@@ -180,40 +180,6 @@ function EnrollPage() {
     }
   }
 
-  if (done) {
-    return (
-      <SiteLayout>
-        <div className="mx-auto max-w-xl px-4 py-20 text-center">
-          <div className="panel p-10">
-            <span className="flex h-14 w-14 mx-auto items-center justify-center rounded-full bg-success text-2xl text-success-foreground">
-              ✓
-            </span>
-            <h1 className="mt-5 text-2xl text-primary">{t("enroll.successTitle")}</h1>
-            <p className="mt-3 text-sm text-muted-foreground">{t("enroll.successBody")}</p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setDone(false);
-                  setPhoto(null);
-                }}
-                className="rounded-md border border-bright-red px-5 py-2.5 text-sm font-semibold text-primary hover:bg-muted"
-              >
-                {t("enroll.again")}
-              </button>
-              <Link
-                to="/"
-                className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
-              >
-                {t("nav.home")}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </SiteLayout>
-    );
-  }
-
   return (
     <SiteLayout>
       <div className="mx-auto max-w-2xl px-4 py-12">
