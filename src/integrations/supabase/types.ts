@@ -79,107 +79,57 @@ export type Database = {
       members: {
         Row: {
           address: string
-          application_id: string | null
           constituency: string
           created_at: string
-          crf_no: string
+          cpf_no: string
+          date_of_birth: string | null
           district: string
           full_name: string
           id: string
           is_active: boolean
           joined_at: string
+          member_number: number
           phone: string
           photo_path: string | null
+          posting: string | null
           state: string
           user_id: string | null
         }
         Insert: {
           address: string
-          application_id?: string | null
           constituency: string
           created_at?: string
-          crf_no: string
+          cpf_no: string
+          date_of_birth?: string | null
           district: string
           full_name: string
           id?: string
           is_active?: boolean
           joined_at?: string
+          member_number?: number
           phone: string
           photo_path?: string | null
+          posting?: string | null
           state?: string
           user_id?: string | null
         }
         Update: {
           address?: string
-          application_id?: string | null
           constituency?: string
           created_at?: string
-          crf_no?: string
+          cpf_no?: string
+          date_of_birth?: string | null
           district?: string
           full_name?: string
           id?: string
           is_active?: boolean
           joined_at?: string
+          member_number?: number
           phone?: string
           photo_path?: string | null
+          posting?: string | null
           state?: string
           user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "members_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: true
-            referencedRelation: "membership_applications"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      membership_applications: {
-        Row: {
-          address: string
-          constituency: string
-          created_at: string
-          district: string
-          full_name: string
-          id: string
-          phone: string
-          photo_path: string | null
-          review_notes: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          state: string
-          status: string
-        }
-        Insert: {
-          address: string
-          constituency: string
-          created_at?: string
-          district: string
-          full_name: string
-          id?: string
-          phone: string
-          photo_path?: string | null
-          review_notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          state?: string
-          status?: string
-        }
-        Update: {
-          address?: string
-          constituency?: string
-          created_at?: string
-          district?: string
-          full_name?: string
-          id?: string
-          phone?: string
-          photo_path?: string | null
-          review_notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          state?: string
-          status?: string
         }
         Relationships: []
       }
@@ -233,8 +183,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_application: { Args: { _application_id: string }; Returns: Json }
+      enroll_member: {
+        Args: {
+          _address: string
+          _constituency: string
+          _date_of_birth: string
+          _district: string
+          _full_name: string
+          _phone: string
+          _photo_path: string
+        }
+        Returns: Json
+      }
       generate_public_token: { Args: never; Returns: string }
+      phone_can_apply: { Args: { _phone: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -243,10 +205,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
-      reject_application: {
-        Args: { _application_id: string; _notes?: string }
-        Returns: undefined
-      }
+      track_application: { Args: { _phone: string }; Returns: Json }
       verify_card: { Args: { _token: string }; Returns: Json }
     }
     Enums: {

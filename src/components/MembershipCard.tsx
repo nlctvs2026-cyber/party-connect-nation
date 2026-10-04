@@ -57,11 +57,11 @@ export function MembershipCard({ token, values }: Props) {
   }
 
   return (
-    <div
-      id="membership-card"
-      className="max-w-full overflow-x-auto"
-      // Template HTML is authored by administrators only.
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div id="membership-card" className="max-w-full overflow-x-auto">
+      {/* The active HTML card template with the member's data. Template HTML
+          is authored by administrators only, and the printed/downloaded file
+          contains exactly this card and nothing else. */}
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </div>
   );
 }

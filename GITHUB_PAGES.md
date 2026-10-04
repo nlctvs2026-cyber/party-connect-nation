@@ -142,9 +142,12 @@ them on purpose (the Dashboard rejects them too).
 - **No build secrets are needed.** All `VITE_*` values are already in the
   tracked `.env` and are public by design (publishable anon key). The static
   build inlines them into the client bundle.
-- **QR codes use `window.location.origin`** — QR codes generated from the Pages
-  site point at Pages. Previously printed QRs pointing at the old Lovable URL
-  must be re-generated from the admin after the move.
+- **QR codes use `window.location.origin`** — they are rendered client-side on
+  `/verify/<token>` (via `/card`) and never stored, so a QR always encodes
+  whatever domain it was viewed on. Previously printed QRs pointing at the old
+  Lovable/`github.io` URL must be re-opened on the current domain and
+  re-printed. GitHub 301-redirects `github.io` to a custom domain, so old QRs
+  often still resolve — test one before bulk reprinting.
 - **Re-deploys** run on every push to `main` or `Akash`; the normal
   Lovable/server build path is untouched.
 - **Troubleshooting:** if the site loads but assets 404, the Pages source is

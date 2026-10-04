@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { BrandStrip } from "@/components/BrandStrip";
 import { MembershipCard } from "@/components/MembershipCard";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useI18n } from "@/i18n";
+import { downloadCardHtml } from "@/lib/card-download";
 import { formatDate } from "@/lib/format";
 import { memberPhotoUrl, verifyCard } from "@/services/membership";
 
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/verify/$token")({
 function VerifyPage() {
   const { token } = Route.useParams();
   const { t, language } = useI18n();
+  const [downloading, setDownloading] = useState(false);
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["verify-card", token],
@@ -69,7 +72,24 @@ function VerifyPage() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-12">
-        <div className="panel overflow-hidden">
+        {/* BUG-16: the ID card leads the page; the verification details panel
+            sits below it. */}
+        <MembershipCard
+          token={token}
+          values={{
+            name: data.full_name,
+            member_number: String(data.member_number).padStart(6, "0"),
+            cpf_no: data.cpf_no,
+            posting: data.posting ?? "",
+            date_of_birth: data.date_of_birth ?? "",
+            district: data.district,
+            state: data.state,
+            constituency: data.constituency,
+            photo: data.photo_path ? memberPhotoUrl(token) : "",
+          }}
+        />
+
+        <div className="panel no-print mt-10 overflow-hidden">
           <BrandStrip />
           <div className="p-6">
             <div className="flex flex-wrap items-center gap-3">
@@ -85,9 +105,14 @@ function VerifyPage() {
               <h1 className="text-xl text-primary">{t("card.verificationTitle")}</h1>
             </div>
 
-            <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+            <dl className="mt-6 grid gap-4 break-anywhere sm:grid-cols-2">
               <Detail label={t("common.name")} value={data.full_name} />
-              <Detail label={t("card.crf")} value={data.crf_no} />
+              <Detail
+                label={t("card.memberNo")}
+                value={String(data.member_number).padStart(6, "0")}
+              />
+              <Detail label={t("card.cpf")} value={data.cpf_no} />
+              {data.posting ? <Detail label={t("card.posting")} value={data.posting} /> : null}
               <Detail label={t("card.district")} value={data.district} />
               <Detail label={t("card.constituency")} value={data.constituency} />
               <Detail label={t("card.state")} value={data.state} />
@@ -97,28 +122,26 @@ function VerifyPage() {
           </div>
         </div>
 
-        <div className="mt-10">
-          <MembershipCard
-            token={token}
-            values={{
-              name: data.full_name,
-              crf_no: data.crf_no,
-              district: data.district,
-              state: data.state,
-              constituency: data.constituency,
-              photo: data.photo_path ? memberPhotoUrl(token) : "",
-            }}
-          />
-        </div>
-
-        <div className="no-print mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            {t("card.print")}
-          </button>
+        <div className="no-print mt-6">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={downloading}
+              onClick={async () => {
+                const card = document.querySelector("#membership-card");
+                if (!card) return;
+                setDownloading(true);
+                try {
+                  await downloadCardHtml(card.innerHTML);
+                } finally {
+                  setDownloading(false);
+                }
+              }}
+              className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {downloading ? t("card.downloading") : t("card.download")}
+            </button>
+          </div>
         </div>
       </div>
     </SiteLayout>

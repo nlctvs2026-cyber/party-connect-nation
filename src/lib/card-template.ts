@@ -7,7 +7,10 @@
  */
 export const CARD_PLACEHOLDERS = [
   "name",
-  "crf_no",
+  "member_number",
+  "cpf_no",
+  "posting",
+  "date_of_birth",
   "phone",
   "address",
   "district",
@@ -48,8 +51,8 @@ export const STARTER_TEMPLATE = `<!--
   Edit this file, then upload it in /admin -> Card templates.
 
   Supported placeholders - each {{token}} is replaced with live member data:
-    {{name}}  {{crf_no}}  {{phone}}  {{address}}  {{district}}
-    {{state}}  {{constituency}}  {{photo}}  {{qr_code}}
+    {{name}}  {{member_number}}  {{cpf_no}}  {{posting}}  {{date_of_birth}}  {{phone}}
+    {{address}}  {{district}}  {{state}}  {{constituency}}  {{photo}}  {{qr_code}}
 
   Notes:
   - Values are HTML-escaped and unknown tokens render as empty text.
@@ -66,7 +69,10 @@ export const STARTER_TEMPLATE = `<!--
     <img src="{{photo}}" alt="photo" style="width:120px;height:150px;object-fit:cover;border:3px solid #EBC336;border-radius:8px;background:#fff" />
     <div style="flex:1;font-size:14px;line-height:1.7">
       <div style="font-size:19px;font-weight:bold;color:#790604">{{name}}</div>
-      <div><b>CRF No:</b> {{crf_no}}</div>
+      <div><b>Member No:</b> {{member_number}}</div>
+      <div><b>CPF No:</b> {{cpf_no}}</div>
+      <div><b>Posting:</b> {{posting}}</div>
+      <div><b>Date of birth:</b> {{date_of_birth}}</div>
       <div><b>Phone:</b> {{phone}}</div>
       <div><b>Address:</b> {{address}}</div>
       <div><b>District:</b> {{district}}</div>
@@ -108,7 +114,10 @@ export function downloadCardTemplate(name: string, html: string): void {
 /** Sample data used for admin template previews. */
 export const PREVIEW_VALUES: CardValues = {
   name: "Preview Member",
-  crf_no: "CRF-2026-001001",
+  member_number: "000042",
+  cpf_no: "CPF-2026-001001",
+  posting: "Member",
+  date_of_birth: "1990-06-15",
   phone: "9000000000",
   address: "12, Gandhi Street, Anna Nagar",
   district: "Madurai",

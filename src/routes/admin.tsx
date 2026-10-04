@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { MembersList } from "@/components/admin/MembersList";
-import { PendingApplications } from "@/components/admin/PendingApplications";
 import { TemplatesManager } from "@/components/admin/TemplatesManager";
 import { BrandStrip } from "@/components/BrandStrip";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -26,13 +25,13 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "pending" | "members" | "templates";
+type Tab = "members" | "templates";
 
 function AdminPage() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const [state, setState] = useState<"checking" | "anonymous" | "forbidden" | "admin">("checking");
-  const [tab, setTab] = useState<Tab>("pending");
+  const [tab, setTab] = useState<Tab>("members");
 
   const check = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
@@ -78,7 +77,6 @@ function AdminPage() {
   }
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: "pending", label: t("admin.tabs.pending") },
     { id: "members", label: t("admin.tabs.members") },
     { id: "templates", label: t("admin.tabs.templates") },
   ];
@@ -120,7 +118,6 @@ function AdminPage() {
           ))}
         </nav>
 
-        {tab === "pending" ? <PendingApplications /> : null}
         {tab === "members" ? <MembersList /> : null}
         {tab === "templates" ? <TemplatesManager /> : null}
       </div>

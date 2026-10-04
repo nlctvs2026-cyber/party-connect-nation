@@ -1,8 +1,10 @@
 # NLCTVS — Tamizhaga Vazhvurimai Katchi Membership Portal
 
-A bilingual (English / Tamil) party membership portal: public enrollment, admin review,
-approval-driven member and card creation, HTML card templates, and QR-based public
-verification.
+A bilingual (English / Tamil) party membership portal: instant public enrollment (the
+digital card is issued immediately), HTML card templates, QR-based public verification,
+and mobile-number card lookup.
+
+**Live site:** https://www.nlctvs.us.ci/
 
 Stack: React 19 + TypeScript + TanStack Start (file-based routing, SSR + server routes),
 Tailwind CSS v4, and Lovable Cloud (Supabase: Postgres, Auth, Storage).
@@ -15,12 +17,11 @@ Tailwind CSS v4, and Lovable Cloud (Supabase: Postgres, Auth, Storage).
 | --- | --- | --- |
 | `/` | public | Hero, enrollment CTA, party and founder information |
 | `/enroll` | public | Enrollment form (state fixed to Tamil Nadu) |
-| `/card` | public | Enter a card code to open a membership card |
+| `/card` | public | Open a membership card by the mobile number it was enrolled with |
 | `/verify/:token` | public | Card verification + rendered card (QR target) |
-| `/admin` | admin only | Login, pending applications, members, card templates |
 | `/api/public/photo/:token` | public | Streams a member photo via a short-lived signed URL |
 
-There is no admin link anywhere in the public site — `/admin` must be typed manually.
+The review/management console is not linked from anywhere in the public site.
 
 ---
 
@@ -35,14 +36,11 @@ Created automatically by the `handle_new_user` trigger.
 Roles are never stored on `profiles`. Checked through the `SECURITY DEFINER` functions
 `has_role(uuid, app_role)` and `is_admin()`.
 
-**`membership_applications`** — enrollment submissions.
-`full_name`, `phone` (10 digits, CHECK), `address`, `district`, `state`
-(CHECK `= 'Tamil Nadu'`), `constituency`, `photo_path`, `status`
-(CHECK `pending | approved | rejected`, default `pending`), `review_notes`,
-`reviewed_by`, `reviewed_at`. Indexed on `(status, created_at)`.
-
-**`members`** — approved members only. `application_id` (unique FK), optional `user_id`
-(unique), `crf_no` (unique, generated), personal fields, `photo_path`, `is_active`, `joined_at`.
+**`members`** — every enrolled member (membership is instant; there is no application
+step). `phone` is UNIQUE (10 digits) — one membership per mobile number, which is also
+what makes duplicate submissions impossible. Plus `crf_no` (unique, generated), `full_name`,
+`address`, `district`, `state` (always Tamil Nadu), `constituency`, `date_of_birth`
+(DATE, CHECK 18+), `photo_path`, `is_active`, `joined_at`. Indexed on `phone`.
 
 **`member_cards`** — one card per member. `member_id` (unique FK, cascade),
 `public_token` (unique, cryptographically random 14 chars), `issued_at`, `revoked_at`.
@@ -55,10 +53,11 @@ active template), `created_by`.
 | Function | Who can run it | What it does |
 | --- | --- | --- |
 | `has_role(uuid, app_role)` / `is_admin()` | authenticated | Role checks used inside RLS policies |
-| `approve_application(uuid)` | admins only | Creates the member, generates the CRF number and card token, marks the application approved — all in one transaction |
-| `reject_application(uuid, text)` | admins only | Marks a pending application rejected; rejected applications can never become members |
+| `enroll_member(...)` | anon + authenticated | Instant enrollment: creates the member, CRF number and card token in one transaction; refuses duplicates via the unique phone constraint |
 | `generate_public_token()` | internal | Random, non-sequential card token from `gen_random_bytes` |
 | `verify_card(text)` | anon + authenticated | Public verification; returns only name, CRF, district, state, constituency, photo path, issue date and validity — never phone or address |
+| `track_application(text)` | anon + authenticated | Public card lookup by mobile number; returns a minimal payload (name, CRF, district, constituency, joined date, card token) — never address |
+| `phone_can_apply(text)` | anon + authenticated | True when the number is not a member yet; used by the enrollment form for an instant duplicate check |
 
 CRF numbers are issued by the database (`CRF-<year>-<sequence>`). Users can never choose or
 enter one.
@@ -68,12 +67,13 @@ enter one.
 ## 3. Security model
 
 - Authorization is enforced by Postgres **Row Level Security**, not by React routes.
-- **Anonymous**: may insert a `pending` application and upload a photo into
-  `member-photos/applications/`; may read the active card template and call `verify_card`.
-  Cannot read applications, members or cards.
+- **Anonymous**: may enroll through the `enroll_member` function (the only way member rows
+  are created) and upload a photo into `member-photos/applications/`; may read the active
+  card template and call `verify_card` / `track_application`. Cannot read member rows
+  directly.
 - **Members**: may read their own `members` / `member_cards` rows (`user_id = auth.uid()`).
-  Cannot read others' data, cannot approve anything, cannot change roles.
-- **Admins**: full review and management access through `is_admin()` policies.
+  Cannot read others' data or change roles.
+- **Admins**: full management access through `is_admin()` policies.
 - Photos live in a **private** storage bucket (`member-photos`, 5 MB limit). Only admins can
   read objects directly; the public card fetches the photo through
   `/api/public/photo/:token`, which resolves the token server-side and proxies a 5-minute
@@ -116,7 +116,7 @@ member's data; unknown placeholders render as empty text, and all values are HTM
 Cards are never stored as images: the active template plus live database data are rendered
 in the browser each time, then printed or saved as PDF.
 
-Admins upload templates in **/admin → Card templates** (paste HTML or upload an `.html`
+Admins upload templates from the card-templates manager (paste HTML or upload an `.html`
 file), preview them with sample data, and set exactly one template active. A **Download
 starter template** button hands an admin a commented base file that uses every placeholder,
 and any saved template can be downloaded back as `.html` — both make it easy to develop new
@@ -145,7 +145,7 @@ select id, 'admin' from auth.users where email = 'admin@example.com'
 on conflict do nothing;
 ```
 
-3. Go to `/admin` and sign in. Accounts without the `admin` role are refused, both in the UI
+3. Sign in with that account. Accounts without the `admin` role are refused, both in the UI
    and by every RLS policy.
 
 ---
@@ -195,7 +195,10 @@ Deploy automatically with `.github/workflows/deploy-pages.yml`:
 
 1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 2. Push to `main` (or `Akash`), or run the workflow manually.
-3. The site lands at `https://<owner>.github.io/<repo>/`.
+3. The site lands at the custom domain: `https://www.nlctvs.us.ci/`
+   (a custom domain serves from the root, so the workflow builds with
+   `CUSTOM_DOMAIN: "1"` → Vite `base = "/"`). Without a custom domain it would be
+   `https://<owner>.github.io/<repo>/`.
 
 No build secrets are required: `.env` already carries the `VITE_*` values, which are public
 by design (they ship in the browser bundle either way). Never add `SUPABASE_SERVICE_ROLE_KEY`
@@ -232,7 +235,7 @@ src/
   i18n/              language-en.json, language-ta.json, provider
   integrations/      generated backend client and types
   lib/               constants, card template engine, QR, formatting
-  routes/            file-based routes (public pages, /admin, api)
+  routes/            file-based routes (public pages, api)
   services/          database access: membership.ts (public), admin.ts (admin)
 drizzle/migrations/  SQL schema, policies and functions
 ```

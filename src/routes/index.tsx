@@ -5,6 +5,7 @@ import partyFlag from "@/assets/favicon.jpeg";
 import nlcBanner from "@/assets/nlc-banner.jpg";
 import { BrandStrip } from "@/components/BrandStrip";
 import { SiteLayout } from "@/components/SiteLayout";
+import { TvkHero } from "@/components/TvkHero";
 import { useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/")({
@@ -14,13 +15,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Enroll as a party member in Tamil Nadu, get office approval, and receive a verifiable digital membership card with a QR verification code.",
+          "Enroll as a party member in Tamil Nadu and instantly receive a verifiable digital membership card with a QR verification code.",
       },
       { property: "og:title", content: "NLCTVS Membership — Tamizhaga Vazhvurimai Katchi" },
       {
         property: "og:description",
         content:
-          "Enroll as a party member in Tamil Nadu and receive a verifiable digital membership card.",
+          "Enroll as a party member in Tamil Nadu and instantly receive a verifiable digital membership card.",
       },
     ],
   }),
@@ -96,11 +97,10 @@ function HomePage() {
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-2xl text-foreground">{t("home.steps.title")}</h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
           {[
             { n: "1", title: t("home.steps.one"), body: t("home.steps.oneBody") },
-            { n: "2", title: t("home.steps.two"), body: t("home.steps.twoBody") },
-            { n: "3", title: t("home.steps.three"), body: t("home.steps.threeBody") },
+            { n: "2", title: t("home.steps.three"), body: t("home.steps.threeBody") },
           ].map((step) => (
             <article key={step.n} className="panel p-6">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold font-display text-gold-foreground">
@@ -141,7 +141,6 @@ function HomePage() {
                 ["about.facts.founded", "about.facts.foundedValue"],
                 ["about.facts.ideology", "about.facts.ideologyValue"],
                 ["about.facts.headquarters", "about.facts.headquartersValue"],
-                ["about.facts.secretary", "about.facts.secretaryValue"],
               ] as [string, string][]).map(([labelKey, valueKey]: [string, string]) => (
                 <div key={labelKey} className="panel p-4">
                   <dt className="text-xs uppercase tracking-wide text-muted-foreground">

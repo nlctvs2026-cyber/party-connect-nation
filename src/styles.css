@@ -1,8 +1,26 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+/* Client hero design, scoped under .tvk-hero (see src/styles/hero.css). */
+@import "./styles/hero.css";
 
 @custom-variant dark (&:is(.dark *));
+
+/*
+ * Unbreakable member data (a name pasted as one 300-char word) must wrap
+ * instead of stretching tables, panels and cards into a horizontal scroll.
+ * `anywhere` (not `break-word`) also shrinks the min-content width, which is
+ * what lets auto-layout table columns actually collapse.
+ */
+@utility break-anywhere {
+  overflow-wrap: anywhere;
+}
+
+/* Same guarantee inside rendered card templates ({{name}} etc.). */
+#membership-card,
+#membership-card * {
+  overflow-wrap: anywhere;
+}
 
 /*
  * Design system — party brand palette.
@@ -105,7 +123,7 @@
   }
 }
 
-/* Tricolour brand strip: red / green / gold */
+/* Tricolour brand strip: gold / green / red */
 @utility brand-strip {
   display: flex;
   width: 100%;
@@ -125,7 +143,7 @@
   }
 
   & > span:nth-child(3) {
-    background: var(--gold);
+    background: var(--primary);
   }
 }
 
@@ -178,4 +196,13 @@ img.banner {
   body {
     background: white;
   }
+
+  /* QA BUG-19: the printed/downloaded file contains the active card template
+     only. Every non-card element on the page carries .no-print (header,
+     strips, footer, buttons, verification panel), so nothing else needs
+     hiding here — a universal selector must NOT be used, since display:none
+     on an ancestor would hide the card subtree as well and produce a blank
+     page. The card container keeps its own overflow, so the template's photo
+     frame crops exactly as it does on screen (the "window" effect) instead
+     of layers overflowing the card in print. */
 }
