@@ -113,7 +113,9 @@
   }
 }
 
-/* Tricolour brand strip: gold / green / red */
+/* Tricolour brand strip: gold / green / red.
+   Client request: the strip's red must be a true red (#EC2A21), not the
+   maroon brand red (#790604 / --primary) used elsewhere on the site. */
 @utility brand-strip {
   display: flex;
   width: 100%;
@@ -133,7 +135,7 @@
   }
 
   & > span:nth-child(3) {
-    background: var(--primary);
+    background: #ec2a21;
   }
 }
 
