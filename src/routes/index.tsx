@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import founderPhoto from "@/assets/founder-velmurugan.jpg";
+import partyFlag from "@/assets/favicon.jpeg";
+import nlcBanner from "@/assets/nlc-banner.jpg";
 import { BrandStrip } from "@/components/BrandStrip";
 import { SiteLayout } from "@/components/SiteLayout";
 import { TvkHero } from "@/components/TvkHero";
@@ -31,7 +33,67 @@ function HomePage() {
 
   return (
     <SiteLayout>
-      <TvkHero />
+      {/* 1. Uploaded banner — exact image from nlc_banner_exact.html, fluid width */}
+      <section className="banner-section" aria-label={t("app.fullName")}>
+        <div className="banner-frame">
+          <img
+            className="banner"
+            src={nlcBanner}
+            alt={`${t("app.party")} — ${t("app.fullName")}, ${t("app.state")}`}
+            width={1672}
+            height={941}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </div>
+      </section>
+
+      {/* 2. Official Membership Enrollment hero — unchanged, now directly below the banner */}
+      <section className="border-b border-border bg-card">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.2fr_1fr] md:items-center md:py-24">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">
+              {t("home.eyebrow")}
+            </p>
+            <h1 className="mt-4 text-4xl leading-tight text-primary md:text-5xl">
+              {t("home.title")}
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+              {t("home.subtitle")}
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                to="/enroll"
+                className="rounded-md bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground shadow-elegant transition-opacity hover:opacity-90"
+              >
+                {t("home.cta")}
+              </Link>
+              <Link
+                to="/card"
+                className="rounded-md border border-bright-red px-6 py-3 text-center text-sm font-semibold text-primary transition-colors hover:bg-muted"
+              >
+                {t("home.secondaryCta")}
+              </Link>
+            </div>
+          </div>
+
+          <div className="panel overflow-hidden">
+            <BrandStrip />
+            <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
+              <img
+                src={partyFlag}
+                alt={t("app.party")}
+                className="h-24 w-24 rounded-full border-4 border-gold object-cover"
+              />
+              <p className="font-display text-2xl text-primary">{t("app.party")}</p>
+              <p className="text-sm font-medium text-foreground">{t("app.fullName")}</p>
+              <p className="text-sm text-muted-foreground">{t("app.state")}</p>
+            </div>
+            <BrandStrip />
+          </div>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-2xl text-foreground">{t("home.steps.title")}</h2>

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/photo/$token")({
           return new Response("Not found", { status: 404 });
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { supabaseAdmin } = await import("@/integrations/external/client.server");
 
         const { data: card } = await supabaseAdmin
           .from("member_cards")

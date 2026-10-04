@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/external/client";
 import { PHOTO_BUCKET } from "@/lib/constants";
 import type { CardTemplate, Member } from "./membership";
 

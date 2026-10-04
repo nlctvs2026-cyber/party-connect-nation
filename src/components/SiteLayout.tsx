@@ -9,7 +9,7 @@ import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "./ui/
 import { useI18n } from "@/i18n";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
-  const { t, language, setLanguage } = useI18n();
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
@@ -36,6 +36,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               <span className="block text-xs text-muted-foreground">{t("app.fullName")}</span>
             </span>
           </Link>
+
           {/* Desktop nav */}
           <nav className="ml-auto hidden items-center gap-1 text-sm md:flex">
             {navItems.map((item) => (
@@ -48,17 +49,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </span>
           </nav>
 
-          {/* Mobile: circle language toggle (BUG-010) + hamburger */}
-          <div className="ml-auto flex items-center gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setLanguage(language === "ta" ? "en" : "ta")}
-              aria-label={t("nav.language")}
-              title={t("nav.language")}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-xs font-semibold text-foreground transition-colors hover:bg-muted"
-            >
-              {language === "ta" ? "EN" : "த"}
-            </button>
+          {/* Mobile hamburger */}
+          <div className="ml-auto md:hidden">
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
                 <button
@@ -86,6 +78,10 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                     </SheetClose>
                   ))}
                 </nav>
+                <div className="mt-6 border-t border-border pt-6">
+                  <p className="mb-2 text-xs text-muted-foreground">{t("nav.language")}</p>
+                  <LanguageSwitcher />
+                </div>
               </SheetContent>
             </Sheet>
           </div>

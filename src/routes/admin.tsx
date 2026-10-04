@@ -8,7 +8,7 @@ import { TemplatesManager } from "@/components/admin/TemplatesManager";
 import { BrandStrip } from "@/components/BrandStrip";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useI18n } from "@/i18n";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/external/client";
 import { isCurrentUserAdmin } from "@/services/admin";
 
 export const Route = createFileRoute("/admin")({

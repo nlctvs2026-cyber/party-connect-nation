@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/external/client";
 import { BrandStrip } from "@/components/BrandStrip";
 import { useI18n } from "@/i18n";
 
