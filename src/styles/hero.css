@@ -268,7 +268,10 @@
   white-space: pre-line;
   transform: rotate(-3deg);
   font-family: "Catamaran", "Noto Sans Tamil", system-ui, sans-serif;
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  /* The min is what actually applies on phones — 5vw only overtakes it at
+     480px. Lowering just the min shrinks the slogan on small screens and
+     leaves 480px and up untouched. */
+  font-size: clamp(1.25rem, 5vw, 2.5rem);
   line-height: 1.25;
   color: oklch(0.32 0.06 45);
 }
