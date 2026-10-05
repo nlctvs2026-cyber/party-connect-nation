@@ -235,7 +235,11 @@
   margin-inline-start: 0.75rem;
   white-space: nowrap;
   font-family: "Anek Tamil", "Noto Sans Tamil", system-ui, sans-serif;
-  font-size: clamp(1.15rem, 5.6vw, 3.5rem);
+  /* Sized from the measured advance of the Tamil name (17.48em in Anek Tamil)
+   * against the .hero-main padding, so the nowrap title never runs past the
+   * clipped edge of .tvk-hero on a 320px phone. Don't raise the vw without
+   * re-measuring — a longer string silently gets cut off at both ends. */
+  font-size: clamp(0.85rem, 4.5vw, 2.75rem);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: normal;
@@ -414,9 +418,12 @@
     width: 10rem;
   }
 
+  /* The grid caps at 80rem, so above ~1280px the left column stops growing
+   * while vw keeps climbing — hence the hard cap, which keeps the title within
+   * its 1.1fr column instead of riding over the leader image. */
   .tvk-hero .hero-title {
     margin-inline-start: 1.25rem;
-    font-size: clamp(1.85rem, 3.3vw, 3.5rem);
+    font-size: clamp(1.5rem, 2.6vw, 2.15rem);
   }
 
   .tvk-hero .hero-stroke {
