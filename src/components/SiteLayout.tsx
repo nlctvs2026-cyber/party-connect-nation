@@ -22,8 +22,15 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col bg-background">
       <BrandStrip className="no-print" />
       <header className="no-print border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-4">
-          <Link to="/" className="flex items-center gap-3">
+        {/* `flex-nowrap` on phones keeps the language toggle and the hamburger
+            beside the flag instead of letting `flex-wrap` push them onto their
+            own rows, which is what the longer party name caused. The brand
+            link is allowed to shrink (`min-w-0`) so the controls are what give
+            way, and the controls themselves never compress (`shrink-0`).
+            `md:flex-wrap` restores the previous wrapping from tablet up, so the
+            desktop header is unchanged. */}
+        <div className="mx-auto flex max-w-6xl flex-nowrap items-center gap-4 px-4 py-4 md:flex-wrap">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
             <img
               src={partyFlag}
               alt={t("app.party")}
@@ -33,7 +40,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               <span className="block font-display text-lg leading-tight text-primary">
                 {t("app.party")}
               </span>
-              <span className="block text-xs text-muted-foreground">{t("app.fullName")}</span>
+              <span className="block text-[0.625rem] text-muted-foreground">{t("app.fullName")}</span>
               <span className="block text-xs text-muted-foreground">{t("app.registration")}</span>
             </span>
           </Link>
@@ -50,7 +57,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Mobile: circle language toggle (BUG-010) + hamburger */}
-          <div className="ml-auto flex items-center gap-2 md:hidden">
+          <div className="ml-auto flex shrink-0 items-center gap-2 md:hidden">
             <button
               type="button"
               onClick={() => setLanguage(language === "ta" ? "en" : "ta")}
