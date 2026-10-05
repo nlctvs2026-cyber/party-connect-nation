@@ -63,11 +63,16 @@ export function MembersList() {
         {isFetching ? <span className="text-xs text-muted-foreground">…</span> : null}
       </div>
 
+      {/* Below `lg` the columns were squeezed to the phone viewport and
+          `overflow-wrap: anywhere` let each name break one character per line.
+          A min-width gives the columns room and lets the wrapper scroll
+          sideways; `members-table` keeps the cells on one line at those widths
+          only. From `lg` up neither applies, so the desktop table is unchanged. */}
       {members.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("admin.members.empty")}</p>
       ) : (
         <div className="panel overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="members-table w-full min-w-[900px] text-left text-sm lg:min-w-0">
             <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="break-anywhere px-4 py-3">{t("common.name")}</th>

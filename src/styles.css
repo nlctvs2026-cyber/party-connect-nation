@@ -146,6 +146,19 @@
   box-shadow: var(--shadow-card);
 }
 
+/* Admin members table (QA: name column wrapped one character per line on
+   phones). Below `lg` the nine columns are narrower than a single Tamil name
+   and the cells carry `overflow-wrap: anywhere`, so text broke mid-word in a
+   squeezed column. Holding the cells on one line lets the table's min-width
+   take effect and the wrapper scroll sideways instead. `:where()` keeps the
+   specificity at zero, and the rule is scoped to the widths that need it, so
+   from `lg` up no white-space is declared and the desktop table is unchanged. */
+@media (width < 64rem) {
+  .members-table :where(th, td) {
+    white-space: nowrap;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
