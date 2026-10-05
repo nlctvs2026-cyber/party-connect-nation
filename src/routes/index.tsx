@@ -65,9 +65,6 @@ function HomePage() {
                 {t("about.founderTitle")}
               </p>
               <h3 className="mt-1 font-display text-xl text-primary">{t("about.founderName")}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {t("about.founderBody")}
-              </p>
             </div>
           </div>
 
