@@ -34,6 +34,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                 {t("app.party")}
               </span>
               <span className="block text-xs text-muted-foreground">{t("app.fullName")}</span>
+              <span className="block text-xs text-muted-foreground">{t("app.registration")}</span>
             </span>
           </Link>
           {/* Desktop nav */}
