@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { renderCardTemplate, type CardValues } from "@/lib/card-template";
+import { extractTemplateStyles, renderCardTemplate, type CardValues } from "@/lib/card-template";
 import { verificationQrDataUrl } from "@/lib/qr";
 import { fetchActiveTemplate } from "@/services/membership";
 import { useI18n } from "@/i18n";
@@ -33,7 +33,17 @@ export function MembershipCard({ token, values }: Props) {
           setState("empty");
           return;
         }
-        setHtml(renderCardTemplate(template.html, { ...JSON.parse(valuesKey), qr_code: qr }));
+        const values = { ...JSON.parse(valuesKey), qr_code: qr };
+        const rendered = renderCardTemplate(template.html, values);
+        // Templates can arrive as full documents with their own <style>. Scope
+        // those rules to the card so `body`/`:root`/`*` selectors from the
+        // client's file can't restyle the host page.
+        const { body, css } = extractTemplateStyles(rendered);
+        setHtml(
+          css
+            ? `<style>${css}</style><div class="tvk-card-scope">${body}</div>`
+            : `<div class="tvk-card-scope">${body}</div>`,
+        );
         setState("ready");
       } catch {
         if (!cancelled) setState("error");

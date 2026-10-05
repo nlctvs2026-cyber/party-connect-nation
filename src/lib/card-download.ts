@@ -1,73 +1,56 @@
 /**
- * One-click download of the rendered membership card (QA BUG-19).
+ * Membership card download (QA BUG-19).
  *
- * The click produces a single .html file containing exactly the active card
- * template filled with the member's data — no page chrome. The photo and QR
- * are embedded as data URLs, so the file renders identically offline, in any
- * browser, forever (no signed-URL expiry).
+ * The button converts the rendered card (the active admin template, exactly
+ * as it looks on screen) into a single-page PDF and saves it — no print
+ * dialog. Rendering happens client-side:
+ *
+ *   1. html-to-image rasterizes the card DOM into a high-resolution PNG
+ *      (pixel-perfect: webfonts, embedded base64 artwork, photo, QR —
+ *      everything visible on screen is captured).
+ *   2. jsPDF places that image on a page sized exactly to the card, so the
+ *      output has no margins and no blank second page.
+ *
+ * html-to-image and jsPDF are big; they are loaded on first use only, so
+ * visitors who never download don't pay for them.
  */
 
-/** Fetch an image and convert it to a base64 data URL; null if unreachable. */
-async function toDataUrl(url: string): Promise<string | null> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const blob = await response.blob();
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
+/** Export the card element as a crisp PNG (2× device pixels, white matte). */
+async function rasterizeCard(card: HTMLElement): Promise<string> {
+  const { toPng } = await import("html-to-image");
+  return toPng(card, {
+    cacheBust: true,
+    pixelRatio: 2,
+    backgroundColor: "#ffffff",
+    // Reset transforms so the capture isn't offset by page-level centering.
+    style: { transform: "none" },
+  });
 }
 
 /**
- * Build the downloadable card document and trigger the browser's save dialog.
- * Resolves once the download has been kicked off.
+ * Render `card` into a one-page PDF sized to the card and trigger the
+ * browser's save dialog. Throws if the card can't be captured.
  */
-export async function downloadCardHtml(cardHtml: string): Promise<void> {
-  // Inline the photo and QR so the file is fully self-contained. If a fetch
-  // fails (offline, expired link), keep the original URL as a fallback.
-  const images = Array.from(cardHtml.matchAll(/<img\b[^>]*>/gi)).map((match) => match[0]);
-  let inlined = cardHtml;
-  for (const tag of images) {
-    const src = tag.match(/\ssrc="(https?:\/\/[^"]+)"/i)?.[1];
-    if (!src) continue;
-    const dataUrl = await toDataUrl(src);
-    if (dataUrl) inlined = inlined.replace(tag, tag.replace(src, dataUrl));
-  }
+export async function downloadCardPdf(card: HTMLElement): Promise<void> {
+  const [{ jsPDF }, dataUrl] = await Promise.all([
+    import("jspdf"),
+    rasterizeCard(card),
+  ]);
 
-  const document_ = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Membership Card</title>
-<style>
-  html, body { margin: 0; padding: 24px 12px; background: #f5f1e8; }
-  body { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  img { max-width: 100%; }
-  @media print {
-    html, body { background: #fff; padding: 0; }
-    body { display: block; }
-  }
-</style>
-</head>
-<body>
-${inlined}
-</body>
-</html>`;
+  // Natural (unzoomed) card size in CSS pixels → page size in millimetres
+  // at 96 dpi, so the PDF has exactly the card's proportions.
+  const widthPx = card.offsetWidth;
+  const heightPx = card.offsetHeight;
+  const pxToMm = 25.4 / 96;
+  const widthMm = Math.max(widthPx * pxToMm, 1);
+  const heightMm = Math.max(heightPx * pxToMm, 1);
 
-  const blob = new Blob([document_], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "membership-card.html";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  const pdf = new jsPDF({
+    orientation: widthMm >= heightMm ? "landscape" : "portrait",
+    unit: "mm",
+    format: [widthMm, heightMm],
+    compress: true,
+  });
+  pdf.addImage(dataUrl, "PNG", 0, 0, widthMm, heightMm, undefined, "FAST");
+  pdf.save("membership-card.pdf");
 }

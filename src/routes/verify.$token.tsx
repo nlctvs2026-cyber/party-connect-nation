@@ -6,7 +6,7 @@ import { BrandStrip } from "@/components/BrandStrip";
 import { MembershipCard } from "@/components/MembershipCard";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useI18n } from "@/i18n";
-import { downloadCardHtml } from "@/lib/card-download";
+import { downloadCardPdf } from "@/lib/card-download";
 import { formatDate } from "@/lib/format";
 import { memberPhotoUrl, verifyCard } from "@/services/membership";
 
@@ -32,6 +32,7 @@ function VerifyPage() {
   const { token } = Route.useParams();
   const { t, language } = useI18n();
   const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["verify-card", token],
@@ -128,11 +129,14 @@ function VerifyPage() {
               type="button"
               disabled={downloading}
               onClick={async () => {
-                const card = document.querySelector("#membership-card");
+                const card = document.querySelector<HTMLElement>("#membership-card");
                 if (!card) return;
                 setDownloading(true);
+                setDownloadError(false);
                 try {
-                  await downloadCardHtml(card.innerHTML);
+                  await downloadCardPdf(card);
+                } catch {
+                  setDownloadError(true);
                 } finally {
                   setDownloading(false);
                 }
@@ -141,6 +145,9 @@ function VerifyPage() {
             >
               {downloading ? t("card.downloading") : t("card.download")}
             </button>
+            {downloadError ? (
+              <p className="w-full text-xs text-destructive">{t("common.error")}</p>
+            ) : null}
           </div>
         </div>
       </div>

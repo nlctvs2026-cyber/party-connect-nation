@@ -41,6 +41,54 @@ export function renderCardTemplate(html: string, values: CardValues): string {
   });
 }
 
+const STYLE_TAG_PATTERN = /<style([^>]*)>([\s\S]*?)<\/style>/gi;
+
+/**
+ * Extract `<style>` blocks from a template and scope every rule under a
+ * wrapper selector.
+ *
+ * Templates may be full documents (the client delivers complete HTML files
+ * with `:root`, `body`, `*` and element rules). Left as-is, those rules would
+ * restyle the whole host page; wrapped, they apply only inside the card.
+ * The wrapper selector is repeated (`.tvk-card-scope, .tvk-card-scope *`) so
+ * bare element selectors like `body { margin:0 }` become descendant rules
+ * instead of being dropped — and a template's own `.card, .card *` selectors
+ * keep working, since the prefix only lowers specificity on the left.
+ */
+export function extractTemplateStyles(html: string): { body: string; css: string } {
+  let css = "";
+  const body = html.replace(STYLE_TAG_PATTERN, (_match, _attrs, rules: string) => {
+    css += `\n${rules}`;
+    return "";
+  });
+
+  if (!css.trim()) return { body, css: "" };
+
+  // Strip comments, then re-scope: `A { … }` → `SCOPE A, SCOPE { … }`.
+  // Splitting on top-level braces handles nested at-rule blocks well enough
+  // for card templates while keeping the transform predictable.
+  const scoped = css
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .trim()
+    .replace(/(^|\})\s*([^{}@]+)\s*\{/g, (_m, brace, selector: string) => {
+      const scopedSelector = selector
+        .trim()
+        .split(",")
+        .map((part) => {
+          const trimmed = part.trim();
+          if (!trimmed) return trimmed;
+          // :root is meaningless inside a fragment — treat it as the scope.
+          if (/^(:root|html|body)$/i.test(trimmed)) return ".tvk-card-scope";
+          return `.tvk-card-scope ${trimmed}`;
+        })
+        .filter(Boolean)
+        .join(", ");
+      return `${brace} ${scopedSelector} {`;
+    });
+
+  return { body, css: scoped };
+}
+
 /**
  * Starter template admins can download to design new cards from scratch.
  * It uses every supported placeholder and documents the rules of the format.
