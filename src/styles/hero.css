@@ -230,9 +230,12 @@
  * Anek Tamil here. */
 .tvk-hero .hero-title {
   margin-top: 1rem;
+  /* Nudged off the left edge so the longer trade-union name doesn't sit flush
+   * against the icons above it. */
+  margin-inline-start: 0.75rem;
   white-space: nowrap;
   font-family: "Anek Tamil", "Noto Sans Tamil", system-ui, sans-serif;
-  font-size: clamp(1.25rem, 6.2vw, 4rem);
+  font-size: clamp(1.15rem, 5.6vw, 3.5rem);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: normal;
@@ -412,7 +415,8 @@
   }
 
   .tvk-hero .hero-title {
-    font-size: clamp(2rem, 3.6vw, 4rem);
+    margin-inline-start: 1.25rem;
+    font-size: clamp(1.85rem, 3.3vw, 3.5rem);
   }
 
   .tvk-hero .hero-stroke {
