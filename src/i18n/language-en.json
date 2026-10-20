@@ -142,7 +142,11 @@
       "count": "{total} members",
       "pageInfo": "Page {page} of {pages}",
       "prev": "Prev",
-      "next": "Next"
+      "next": "Next",
+      "edit": "Edit",
+      "editMember": "Edit Member Details",
+      "saved": "Member updated successfully.",
+      "photoMaxSize": "JPG or PNG, max 5 MB."
     },
     "templates": {
       "empty": "No templates uploaded.",
@@ -173,6 +177,7 @@
     "phone": "Phone",
     "dob": "Date of birth",
     "address": "Address",
-    "status": "Status"
+    "status": "Status",
+    "save": "Save"
   }
 }

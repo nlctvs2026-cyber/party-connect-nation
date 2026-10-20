@@ -60,6 +60,101 @@ export async function listMembersPage(page: number, search: string): Promise<Mem
   return { members: (data ?? []) as MemberWithCard[], total: count ?? 0 };
 }
 
+/** Fields an admin may edit on a member row. */
+export interface MemberEditInput {
+  full_name: string;
+  phone: string;
+  district: string;
+  constituency: string;
+  /** ISO date (yyyy-mm-dd) from the date picker, or null when cleared. */
+  date_of_birth: string | null;
+  /** Optional replacement photo — compressed client-side before it arrives. */
+  photo?: File | null;
+}
+
+function photoExtension(file: File): string {
+  if (file.type === "image/png") return "png";
+  if (file.type === "image/webp") return "webp";
+  return "jpg";
+}
+
+/**
+ * Persist an admin's edits to a member row. When a replacement photo is
+ * provided it is uploaded to the private bucket first, then the row's
+ * `photo_path` is repointed to the new object and the superseded object is
+ * deleted, so photo swaps do not accumulate orphans in the bucket. RLS
+ * restricts the table update and the storage writes/deletes to admins.
+ *
+ * Cleanup is ordered so no reference ever dangles: the old object is removed
+ * only after the row update succeeds, and the fresh upload is removed if the
+ * row update fails (both cleanups are best-effort — they must not mask the
+ * real error or turn a committed save into a reported failure;
+ * scripts/purge-member-photos.mjs remains the manual backstop).
+ */
+export async function updateMember(memberId: string, input: MemberEditInput): Promise<void> {
+  let photoPath: string | null = null;
+  let previousPhotoPath: string | null = null;
+
+  if (input.photo) {
+    // Capture the current path before uploading: after a successful swap this
+    // is the object that has to go. (`members.photo_path` is the only live
+    // reference — membership_applications was dropped in migration 0003 and
+    // every upload uses a fresh UUID path, so nothing else can point at it.)
+    const { data: row, error: readError } = await supabase
+      .from("members")
+      .select("photo_path")
+      .eq("id", memberId)
+      .maybeSingle();
+    if (readError) throw readError;
+    previousPhotoPath = row?.photo_path ?? null;
+
+    photoPath = `applications/${crypto.randomUUID()}.${photoExtension(input.photo)}`;
+    const { error: uploadError } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(photoPath, input.photo, { contentType: input.photo.type, upsert: false });
+    if (uploadError) throw uploadError;
+  }
+
+  const update = {
+    full_name: input.full_name.trim(),
+    phone: input.phone.trim(),
+    district: input.district.trim(),
+    constituency: input.constituency.trim(),
+    date_of_birth: input.date_of_birth,
+    ...(photoPath ? { photo_path: photoPath } : {}),
+  };
+
+  const { error } = await supabase.from("members").update(update).eq("id", memberId);
+  if (error) {
+    // The row still points at the old photo, so the new upload is already
+    // unreferenced — delete it rather than orphaning it on a failed save.
+    if (photoPath) {
+      const { error: rollbackError } = await supabase.storage
+        .from(PHOTO_BUCKET)
+        .remove([photoPath]);
+      if (rollbackError) {
+        console.error(
+          `[admin] orphaned upload ${photoPath} could not be removed: ${rollbackError.message}`,
+        );
+      }
+    }
+    throw error;
+  }
+
+  // Swap committed: the row points at the new object, so the old one is now
+  // an orphan. Best-effort delete — the edit itself already succeeded.
+  if (photoPath && previousPhotoPath && previousPhotoPath !== photoPath) {
+    const { error: removeError } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .remove([previousPhotoPath]);
+    if (removeError) {
+      console.error(
+        `[admin] superseded photo ${previousPhotoPath} could not be deleted: ${removeError.message}`,
+      );
+    }
+  }
+}
+
 /** Signed URL for an admin to view a private photo (expires in 5 minutes). */
 export async function signedPhotoUrl(path: string | null): Promise<string | null> {
   if (!path) return null;
