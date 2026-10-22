@@ -83,6 +83,8 @@ export function MembersList() {
       return updateMember(editMember.id, {
         full_name: editMember.full_name ?? "",
         phone: editMember.phone ?? "",
+        cpf_no: editMember.cpf_no ?? "",
+        posting: editMember.posting ?? "",
         district: editMember.district ?? "",
         constituency: editMember.constituency ?? "",
         date_of_birth: editMember.date_of_birth || null,
@@ -94,7 +96,19 @@ export function MembersList() {
       closeDialog();
       void queryClient.invalidateQueries({ queryKey: ["members"] });
     },
-    onError: () => toast.error(t("common.error")),
+    onError: (error) => {
+      // Unique constraints on cpf_no and phone are the last line of defence
+      // against duplicates — tell the admin which one collided instead of a
+      // generic failure. PostgREST names the offending column in `details`.
+      const info = `${error.message} ${(error as { details?: string }).details ?? ""}`;
+      if ((error as { code?: string }).code === "23505" && /cpf_no/.test(info)) {
+        toast.error(t("enroll.errors.cpfTaken"));
+      } else if ((error as { code?: string }).code === "23505" && /phone/.test(info)) {
+        toast.error(t("enroll.errors.phoneTaken"));
+      } else {
+        toast.error(t("common.error"));
+      }
+    },
   });
 
   if (isPending && !data) {
@@ -244,7 +258,7 @@ export function MembersList() {
       {/* Edit Member Dialog */}
       {openEdit && editMember ? (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm sm:items-center"
+          className="fixed inset-0 z-50 flex justify-center overflow-y-auto bg-black/40 px-4 py-8 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           onClick={(e) => {
@@ -252,7 +266,7 @@ export function MembersList() {
           }}
         >
           <div
-            className="my-8 w-full max-w-lg rounded-lg bg-card p-6 shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
+            className="my-auto w-full max-w-lg rounded-lg bg-card p-6 shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
             role="document"
           >
             <h2 className="mb-5 text-lg font-semibold text-foreground">
@@ -275,6 +289,31 @@ export function MembersList() {
                   className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/25"
                   maxLength={70}
                   required
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
+                  {t("enroll.cpf")}
+                </label>
+                <input
+                  value={editMember.cpf_no ?? ""}
+                  onChange={(e) =>
+                    setEditMember({ ...editMember, cpf_no: e.target.value.toUpperCase() })
+                  }
+                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/25"
+                  maxLength={30}
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
+                  {t("enroll.posting")}
+                </label>
+                <input
+                  value={editMember.posting ?? ""}
+                  onChange={(e) => setEditMember({ ...editMember, posting: e.target.value })}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/25"
+                  maxLength={70}
                 />
               </div>
               <div>
@@ -312,7 +351,7 @@ export function MembersList() {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">
-                  {t("card.constituency")}
+                  {t("enroll.constituency")}
                 </label>
                 <input
                   value={editMember.constituency ?? ""}

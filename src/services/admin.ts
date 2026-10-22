@@ -64,6 +64,10 @@ export async function listMembersPage(page: number, search: string): Promise<Mem
 export interface MemberEditInput {
   full_name: string;
   phone: string;
+  /** CPF number — trimmed and uppercased, matching how enrollment stores it. */
+  cpf_no: string;
+  /** Optional posting — stored NULL when blank, like enrollment. */
+  posting: string;
   district: string;
   constituency: string;
   /** ISO date (yyyy-mm-dd) from the date picker, or null when cleared. */
@@ -118,6 +122,8 @@ export async function updateMember(memberId: string, input: MemberEditInput): Pr
   const update = {
     full_name: input.full_name.trim(),
     phone: input.phone.trim(),
+    cpf_no: input.cpf_no.trim().toUpperCase(),
+    posting: input.posting.trim() || null,
     district: input.district.trim(),
     constituency: input.constituency.trim(),
     date_of_birth: input.date_of_birth,
