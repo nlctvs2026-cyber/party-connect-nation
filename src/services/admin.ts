@@ -64,6 +64,8 @@ export async function listMembersPage(page: number, search: string): Promise<Mem
 export interface MemberEditInput {
   full_name: string;
   phone: string;
+  /** Postal address — trimmed on save, required like enrollment. */
+  address: string;
   /** CPF number — trimmed and uppercased, matching how enrollment stores it. */
   cpf_no: string;
   /** Optional posting — stored NULL when blank, like enrollment. */
@@ -122,6 +124,7 @@ export async function updateMember(memberId: string, input: MemberEditInput): Pr
   const update = {
     full_name: input.full_name.trim(),
     phone: input.phone.trim(),
+    address: input.address.trim(),
     cpf_no: input.cpf_no.trim().toUpperCase(),
     posting: input.posting.trim() || null,
     district: input.district.trim(),

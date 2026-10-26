@@ -83,6 +83,7 @@ export function MembersList() {
       return updateMember(editMember.id, {
         full_name: editMember.full_name ?? "",
         phone: editMember.phone ?? "",
+        address: editMember.address ?? "",
         cpf_no: editMember.cpf_no ?? "",
         posting: editMember.posting ?? "",
         district: editMember.district ?? "",
@@ -327,6 +328,19 @@ export function MembersList() {
                   maxLength={10}
                   type="tel"
                   inputMode="numeric"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
+                  {t("enroll.address")}
+                </label>
+                <textarea
+                  value={editMember.address ?? ""}
+                  onChange={(e) => setEditMember({ ...editMember, address: e.target.value })}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/25"
+                  rows={3}
+                  maxLength={300}
                   required
                 />
               </div>
