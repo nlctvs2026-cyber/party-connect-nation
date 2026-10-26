@@ -151,7 +151,7 @@ export function MembersList() {
         <p className="text-sm text-muted-foreground">{t("admin.members.empty")}</p>
       ) : (
         <div className="panel overflow-x-auto">
-          <table className="members-table w-full min-w-[1000px] text-left text-sm lg:min-w-0">
+          <table className="members-table w-full min-w-[1250px] text-left text-sm lg:min-w-0">
             <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">{t("common.name")}</th>
@@ -159,6 +159,7 @@ export function MembersList() {
                 <th className="px-4 py-3">{t("admin.members.cpf")}</th>
                 <th className="px-4 py-3">{t("admin.members.posting")}</th>
                 <th className="px-4 py-3">{t("common.phone")}</th>
+                <th className="px-4 py-3">{t("common.address")}</th>
                 <th className="px-4 py-3">{t("card.district")}</th>
                 <th className="px-4 py-3">{t("card.constituency")}</th>
                 <th className="px-4 py-3">{t("card.issued")}</th>
@@ -180,6 +181,12 @@ export function MembersList() {
                     <td className="px-4 py-3">{member.cpf_no}</td>
                     <td className="px-4 py-3">{member.posting ?? ""}</td>
                     <td className="px-4 py-3">{member.phone}</td>
+                    {/* Address runs to 300 chars: cap the column and ellipsize
+                        so one long address cannot stretch the whole table;
+                        the full value stays reachable via the title tooltip. */}
+                    <td className="max-w-[240px] truncate px-4 py-3" title={member.address}>
+                      {member.address}
+                    </td>
                     <td className="px-4 py-3">{member.district}</td>
                     <td className="px-4 py-3">{member.constituency}</td>
                     <td className="px-4 py-3">{formatDate(member.joined_at, language)}</td>
